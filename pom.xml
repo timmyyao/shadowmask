@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.shadowmask</groupId>
+  <artifactId>shadowmask</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <name>${project.artifactId}</name>
+  <packaging>pom</packaging>
+  <description>shadowmask</description>
+
+  <modules>
+    <module>core</module>
+    <module>webUI</module>
+    <module>engine</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <encoding>UTF-8</encoding>
+    <scala.tools.version>2.10</scala.tools.version>
+    <scala.version>2.10.6</scala.version>
+    <guava.version>19.0</guava.version>
+    <airlift.version>0.130</airlift.version>
+    <json.version>2.7.4</json.version>
+    <junit.version>4.11</junit.version>
+    <slf4j.version>1.7.21</slf4j.version>
+
+    <protobuf-maven-plugin.version>0.5.0</protobuf-maven-plugin.version>
+    <maven-compiler-plugin.version>3.5</maven-compiler-plugin.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <!-- test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+            <encoding>UTF-8</encoding>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
