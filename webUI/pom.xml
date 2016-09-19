@@ -13,5 +13,62 @@
   <name>${project.artifactId}</name>
   <packaging>war</packaging>
   <description>shadowmask webUI</description>
+  <properties>
+    <scalatra.version>2.3.0.RC3</scalatra.version>
+    <jetty.version>9.3.11.M0</jetty.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.scalatra</groupId>
+      <artifactId>scalatra_2.10</artifactId>
+      <version>${scalatra.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatra</groupId>
+      <artifactId>scalatra-scalate_2.10</artifactId>
+      <version>${scalatra.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatra</groupId>
+      <artifactId>scalatra-json_2.10</artifactId>
+      <version>${scalatra.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatra</groupId>
+      <artifactId>scalatra-swagger_2.10</artifactId>
+      <version>${scalatra.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatra</groupId>
+      <artifactId>scalatra-swagger-ext_2.10</artifactId>
+      <version>${scalatra.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatra</groupId>
+      <artifactId>scalatra-slf4j_2.10</artifactId>
+      <version>${scalatra.version}</version>
+    </dependency>
 
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlets</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
+      <version>3.0.0.v201112011016</version>
+    </dependency>
+
+  </dependencies>
 </project>
