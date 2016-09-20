@@ -36,7 +36,7 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
   with FileUploadSupport
   with JacksonJsonSupport
   with SwaggerSupport
-  with PlainAuthProvider{
+  with PlainAuthProvider {
 
   protected implicit val jsonFormats: Formats = DefaultFormats
 
@@ -49,21 +49,21 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
 
-
   val adminLoginPostOperation = (apiOperation[LoginResult]("adminLoginPost")
     summary "Adminstrator login api"
-    parameters(formParam[String]("username").description(""), formParam[String]("password").description(""))
+    parameters(formParam[String]("username").description("administrator'name")
+    , formParam[String]("password").description("administrator'password"))
     )
 
   post("/admin/login", operation(adminLoginPostOperation)) {
     val username = params.getAs[String]("username")
     val password = params.getAs[String]("password")
-    val (code , info, loginData) =
-    getAuth().auth(Some(User(username.getOrElse(""),password.getOrElse("")))) match {
-      case Some(token)=>(Some(0),Some("successfully"),Some(LoginResultData(Some(token.token))))
-      case _=>(Some(1),Some("failed"),Some(LoginResultData(Some(""))))
-    }
-    LoginResult(code,info,loginData)
+    val (code, info, loginData) =
+      getAuth().auth(Some(User(username.getOrElse(""), password.getOrElse("")))) match {
+        case Some(token) => (Some(0), Some("successfully"), Some(LoginResultData(Some(token.token))))
+        case _ => (Some(1), Some("failed"), Some(LoginResultData(Some(""))))
+      }
+    LoginResult(code, info, loginData)
   }
 
 }
