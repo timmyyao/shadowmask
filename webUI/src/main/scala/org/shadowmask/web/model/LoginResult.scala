@@ -22,22 +22,11 @@
  * limitations under the License.
  */
 
-import javax.servlet.ServletContext
+package org.shadowmask.web.model
 
-import akka.actor.ActorSystem
-import org.scalatra.LifeCycle
-import org.shadowmask.web.api.AdminApi
 
-class ScalatraBootstrap extends LifeCycle {
-  implicit val swagger = new SwaggerApp
-
-  override def init(context: ServletContext) {
-    implicit val system = ActorSystem("appActorSystem")
-    try {
-      context mount (new AdminApi(), "/admin/*")
-      context mount (new ResourcesApp, "/api-docs/*")
-    } catch {
-      case e: Throwable => e.printStackTrace()
-    }
-  }
-}
+case class LoginResult (
+  code: Option[Int],
+  info: Option[String],
+  data: Option[LoginResultData]
+)
