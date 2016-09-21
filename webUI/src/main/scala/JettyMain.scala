@@ -1,6 +1,6 @@
 /**
- * 用户中心api
- * 手机登录，验证码，faq，修改个人信息。
+ * WebApi
+ * apis for webUI
  *
  * OpenAPI spec version: 1.0.0
  * Contact: apiteam@swagger.io
@@ -63,6 +63,5 @@ object JettyMain {
     server setHandler webApp
 
     server.start()
-
   }
 }

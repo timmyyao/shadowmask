@@ -1,0 +1,71 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "WebApi",
+    "description": "apis for webUI",
+    "version": "1.0.0"
+  },
+  "host": "127.0.0.1",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/admin/login": {
+      "post": {
+        "summary": "Adminstrator login api",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "description": "Adminstrator username",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "type": "string",
+            "description": "password for Adminstrator",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return log result",
+            "schema": {
+              "$ref": "#/definitions/LoginResult"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "LoginResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/LoginResultData"
+        }
+      }
+    },
+    "LoginResultData": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
