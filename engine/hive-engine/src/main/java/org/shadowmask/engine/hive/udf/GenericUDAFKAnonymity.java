@@ -25,6 +25,8 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
+import org.shadowmask.core.mask.rules.UDAFObject;
+
 /**
  * Created by root on 7/19/16.
  */
@@ -44,7 +46,6 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
     return new GenericUDAFKAnonymityEvaluator();
   }
 
-
   public static class GenericUDAFKAnonymityEvaluator extends GenericUDAFEvaluator {
     private IntWritable result;
 
@@ -53,53 +54,6 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
 
     private StandardMapObjectInspector internalMergeOI;
     private StandardMapObjectInspector mergeOI;
-
-    static class StringRowInfo {
-      private String row_key_;
-      private int count_ = 0;
-
-      public StringRowInfo(String code) {
-        count_ = 1;
-        row_key_ = code;
-      }
-
-      @Override
-      public int hashCode() {
-        int hash = 0;
-        hash = row_key_.hashCode();
-        return hash;
-      }
-
-      @Override
-      public boolean equals(Object obj) {
-        if(this == obj) {
-          return true;
-        }
-        if(obj == null || getClass() != obj.getClass()) {
-          return false;
-        }
-        StringRowInfo row = (StringRowInfo) obj;
-        if(!row_key_.equals(row.row_key_)) return false;
-        return true;
-      }
-
-      public String getRow() {
-        return row_key_;
-      }
-
-      public Integer getCount() {
-        return count_;
-      }
-
-      void setCount(Integer count) {
-        this.count_ = count;
-      }
-
-      public void increase(Integer cnt) {
-        this.count_ += cnt;
-      }
-
-    }
 
     /** init not completed */
     @Override
@@ -115,7 +69,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
                 ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
 
         inputValueOI = ObjectInspectorFactory.getReflectionObjectInspector(
-            StringRowInfo.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+            UDAFObject.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         return ObjectInspectorFactory.getStandardMapObjectInspector(
             ObjectInspectorUtils.getStandardObjectInspector(inputKeyOI), inputValueOI);
       } else {
@@ -134,7 +88,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
 
           mergeOI = (StandardMapObjectInspector) ObjectInspectorUtils.getStandardObjectInspector(internalMergeOI);
 
-          return ObjectInspectorFactory.getReflectionObjectInspector(StringRowInfo.class,
+          return ObjectInspectorFactory.getReflectionObjectInspector(UDAFObject.class,
               ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         }
       }
@@ -143,7 +97,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
     /** class for storing frequency of different inputs. */
     @AggregationType
     static class FreqTable extends AbstractAggregationBuffer {
-      HashMap<String, StringRowInfo> freqMap;
+      HashMap<String, UDAFObject> freqMap;
 
       void put(Object[] values) {
         String str = "";
@@ -156,8 +110,8 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
         Text txt = uid.evaluate(new Text(str));
         String code = txt.toString();
 
-        StringRowInfo sri = new StringRowInfo(code);
-        StringRowInfo v = freqMap.get(sri.getRow());
+        UDAFObject sri = new UDAFObject(code);
+        UDAFObject v = freqMap.get(sri.getRow());
         if(v == null) {
           sri.setCount(1);
           freqMap.put(sri.getRow(), sri);
@@ -170,13 +124,13 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
       /**
        * return the last minimal frequent value in map
        */
-      StringRowInfo min() {
+      UDAFObject min() {
         int min = Integer.MAX_VALUE;
         if(freqMap.size() == 0) {
           return null;
         }
-        StringRowInfo result = null;
-        for(StringRowInfo value : freqMap.values()) {
+        UDAFObject result = null;
+        for(UDAFObject value : freqMap.values()) {
           if(value.getCount() < min) {
             min = value.getCount();
             result = value;
@@ -196,7 +150,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
 
     @Override
     public void reset(AggregationBuffer agg) throws HiveException {
-      ((FreqTable) agg).freqMap = new HashMap<String, StringRowInfo>();
+      ((FreqTable) agg).freqMap = new HashMap<String, UDAFObject>();
     }
 
     @Override
@@ -208,7 +162,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
     @Override
     public Object terminatePartial(AggregationBuffer agg) throws HiveException {
       FreqTable ft = (FreqTable) agg;
-      HashMap<String, StringRowInfo> ret = new HashMap<String, StringRowInfo>(ft.freqMap);
+      HashMap<String, UDAFObject> ret = new HashMap<String, UDAFObject>(ft.freqMap);
 
       return ret;
     }
@@ -224,12 +178,12 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
         String row = rowTxt.toString();
         IntWritable count = (IntWritable)((LazyBinaryStruct)e.getValue()).getField(1);
 
-        StringRowInfo sri = new StringRowInfo(row);
+        UDAFObject sri = new UDAFObject(row);
         sri.setCount(count.get());
 
         // merge all the patial maps
         if (ft.freqMap.containsKey(sri.getRow())) {
-            StringRowInfo base = ft.freqMap.get(sri.getRow());
+            UDAFObject base = ft.freqMap.get(sri.getRow());
             sri.increase(base.getCount());
             ft.freqMap.put(sri.getRow(), sri);
         } else {
@@ -240,7 +194,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
 
     @Override
     public Object terminate(AggregationBuffer agg) throws HiveException {
-      StringRowInfo minValue = ((FreqTable)agg).min();
+      UDAFObject minValue = ((FreqTable)agg).min();
       if(minValue == null) {
         return null;
       } else {

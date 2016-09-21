@@ -30,6 +30,9 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
+import org.shadowmask.core.mask.rules.UDAFLDObject;
+//import org.shadowmask.engine.hive.udf.UDFUIdentifier;
+
 /**
  * Created by root on 7/19/16.
  */
@@ -66,65 +69,6 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
     private StandardMapObjectInspector internalMergeOI;
     private StandardMapObjectInspector mergeOI;
 
-    static class StringRowInfo {
-      private String row_key_;
-      private int count_ = 0;
-      private String sensitive_value_;
-      private Map<String, Integer> deversities_;
-
-      public StringRowInfo(String code, String value) {
-        count_ = 1;
-        row_key_ = code;
-        sensitive_value_ = value;
-        deversities_ = new HashMap<String, Integer>();
-        deversities_.put(sensitive_value_, 1);
-      }
-
-      @Override
-      public int hashCode() {
-        int hash = 0;
-        hash = row_key_.hashCode();
-        return hash;
-      }
-
-      @Override
-      public boolean equals(Object obj) {
-        if(this == obj) {
-          return true;
-        }
-        if(obj == null || getClass() != obj.getClass()) {
-          return false;
-        }
-        StringRowInfo row = (StringRowInfo) obj;
-        if(!row_key_.equals(row.row_key_)) return false;
-        return true;
-      }
-
-      public String getRow() {
-        return row_key_;
-      }
-
-      public String getSensitiveValue() {
-        return sensitive_value_;
-      }
-
-      public Integer getCount() {
-        return deversities_.size();
-      }
-
-      public HashMap<String, Integer> getDeversities() {
-        return (HashMap<String, Integer>) deversities_;
-      }
-
-      void setCount(Integer count) {
-        this.count_ = count;
-      }
-
-      public void increase(Integer cnt) {
-        this.count_ += cnt;
-      }
-    }
-
     /** init not completed */
     @Override
     public ObjectInspector init(Mode m, ObjectInspector[] parameters)
@@ -140,7 +84,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
                 ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
 
         inputValueOI = ObjectInspectorFactory.getReflectionObjectInspector(
-            StringRowInfo.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+            UDAFLDObject.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         return ObjectInspectorFactory.getStandardMapObjectInspector(
             ObjectInspectorUtils.getStandardObjectInspector(inputKeyOI), inputValueOI);
       } else {
@@ -159,7 +103,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 
           mergeOI = (StandardMapObjectInspector) ObjectInspectorUtils.getStandardObjectInspector(internalMergeOI);
 
-          return ObjectInspectorFactory.getReflectionObjectInspector(StringRowInfo.class,
+          return ObjectInspectorFactory.getReflectionObjectInspector(UDAFLDObject.class,
               ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         }
       }
@@ -168,7 +112,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
     /** class for storing frequency of different inputs. */
     @AggregationType
     static class FreqTable extends AbstractAggregationBuffer {
-      HashMap<String, StringRowInfo> freqMap;
+      HashMap<String, UDAFLDObject> freqMap;
 
       void put(Object[] values) {
         Integer key_columns_num = ((IntWritable) values[0]).get();
@@ -190,8 +134,8 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
         txt = uid.evaluate(new Text(value_str.toString()));
         String value = txt.toString();
 
-        StringRowInfo sri = new StringRowInfo(key, value);
-        StringRowInfo v = freqMap.get(sri.getRow());
+        UDAFLDObject sri = new UDAFLDObject(key, value);
+        UDAFLDObject v = freqMap.get(sri.getRow());
         if(v == null) {
           sri.setCount(1);
           freqMap.put(sri.getRow(), sri);
@@ -209,13 +153,13 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
       /**
        * return the last minimal frequent value in map
        */
-      StringRowInfo min() {
+      UDAFLDObject min() {
         int min = Integer.MAX_VALUE;
         if(freqMap.size() == 0) {
           return null;
         }
-        StringRowInfo result = null;
-        for(StringRowInfo value : freqMap.values()) {
+        UDAFLDObject result = null;
+        for(UDAFLDObject value : freqMap.values()) {
           if(value.getCount() < min) {
             min = value.getCount();
             result = value;
@@ -235,7 +179,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 
     @Override
     public void reset(AggregationBuffer agg) throws HiveException {
-      ((FreqTable) agg).freqMap = new HashMap<String, StringRowInfo>();
+      ((FreqTable) agg).freqMap = new HashMap<String, UDAFLDObject>();
     }
 
     @Override
@@ -247,7 +191,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
     @Override
     public Object terminatePartial(AggregationBuffer agg) throws HiveException {
       FreqTable ft = (FreqTable) agg;
-      HashMap<String, StringRowInfo> ret = new HashMap<String, StringRowInfo>();
+      HashMap<String, UDAFLDObject> ret = new HashMap<String, UDAFLDObject>();
       ret.putAll(ft.freqMap);
       ft.freqMap.clear();
 
@@ -272,11 +216,11 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
         LazyBinaryMap lbm = (LazyBinaryMap)((LazyBinaryStruct)e.getValue()).getField(3);
         Map m = lbm.getMap();
 
-        StringRowInfo sri = new StringRowInfo(row, value);
+        UDAFLDObject sri = new UDAFLDObject(row, value);
         sri.setCount(count.get());
 
         // merge all the patial maps
-        StringRowInfo v = ft.freqMap.get(sri.getRow());
+        UDAFLDObject v = ft.freqMap.get(sri.getRow());
         if(v == null) {
           sri.setCount(1);
           ft.freqMap.put(sri.getRow(), sri);
@@ -297,7 +241,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 
     @Override
     public Object terminate(AggregationBuffer agg) throws HiveException {
-      StringRowInfo minValue = ((FreqTable)agg).min();
+      UDAFLDObject minValue = ((FreqTable)agg).min();
       if(minValue == null) {
         return null;
       } else {
