@@ -4,6 +4,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.shadowmask.core.mask.rules.Truncation;
 
 /**
  * UDFTruncation
@@ -23,25 +24,7 @@ public class UDFTruncation extends UDF{
     String dataStr = data.toString();
     int lengthVal = length.get();
     int modeVal = mode.get();
-    // returns null when the value of 'mode' or 'length' is invalid
-    if(modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if(lengthVal < 0) {
-      throw new RuntimeException("length must be a positive integer");
-    }
-    // returns entire data when 'length' exceeds the length of data
-    if(lengthVal >= dataStr.length()) {
-      result.set(data);
-      return result;
-    }
-    // returns the expected result
-    if(modeVal == 0) {
-      result.set(dataStr.substring(0,lengthVal));
-    }
-    else {
-      result.set(dataStr.substring(dataStr.length()-lengthVal,dataStr.length()));
-    }
+    result.set(Truncation.evaluate(dataStr, lengthVal, modeVal));
     return result;
   }
 }

@@ -115,23 +115,44 @@ public class AppTest
 
     public void testUDFTruncation() {
         UDFTruncation test = new UDFTruncation();
-        Text str = new Text("1234567890");
+        String str = new String("hello! 英特尔@Shanghai紫竹");
+        Text text = new Text(str);
         Text result = new Text();
-        IntWritable length = new IntWritable(4);
-        IntWritable mode = new IntWritable(0);
-        result = test.evaluate(str,length,mode);
-        mode.set(1);
-        result = test.evaluate(str,length,mode);
+        int[] length = {0,1,2,5,10,15,20,21,22,25,30};
+        int[] mode = {0,1};
+        for(int mod : mode) {
+            IntWritable m = new IntWritable(mod);
+            System.out.println("mode="+mod);
+            for (int len : length) {
+                IntWritable l = new IntWritable(len);
+                result = test.evaluate(text, l, m);
+
+                System.out.println(result.toString()+":"+len);
+            }
+        }
     }
 
     public void testUDFMask() {
-        Text data = new Text("hello world");
         UDFMask test = new UDFMask();
-        IntWritable start = new IntWritable(-3);
-        IntWritable end = new IntWritable(0);
+        String str = new String("hello! 英特尔@Shanghai紫竹");
+        Text text = new Text(str);
+        Text result = new Text();
         Text tag = new Text("*");
-        Text result = test.evaluate(data,start,end,tag);
-        result.set("hello");
+        int[] begin = {-5,0,1,5,8,13,20,21,22,30};
+        int[] end = {-10,-4,0,1,6,10,16,21,22,25,50};
+        for(int b : begin) {
+            for(int e : end) {
+                IntWritable beg = new IntWritable(b);
+                IntWritable en = new IntWritable(e);
+                result = test.evaluate(text, beg, en, tag);
+                if(result != null) {
+                    System.out.println(result.toString() + ":" + b + "~" + e);
+                }
+                else {
+                    System.out.println("null" + ":" + b + "~" + e);
+                }
+            }
+        }
     }
 
     public void testUDFPhone() {
