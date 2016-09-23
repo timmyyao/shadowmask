@@ -17,17 +17,18 @@ public class HiveJdbcClient {
         _conn = DriverManager.getConnection("jdbc:hive2://"+ip+":"+String.valueOf(port)+"/default", "", "");	
     }
 
-    public void getTables() throws SQLException {
+    public String[] getTables() throws SQLException {
         Statement stmt = _conn.createStatement();
         String sql = "show tables"; 
         res = stmt.executeQuery(sql);
         if (res.next()) {
             String tables = res.getString(1);
         }
-	return tables;
+	
+	return tables.split(" ");
     }
 
-    public void getFieldsForTable(String tableName) throws SQLException {
+    public List<String> getFieldsForTable(String tableName) throws SQLException {
         Statement stmt = _conn.createStatement();
         String sql = "describe "+ tableName; 
         res = stmt.executeQuery(sql);
