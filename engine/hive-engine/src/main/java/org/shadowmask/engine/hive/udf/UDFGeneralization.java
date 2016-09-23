@@ -8,6 +8,7 @@ import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.shadowmask.core.mask.rules.Generalization;
 
 
 /**
@@ -19,17 +20,6 @@ import org.apache.hadoop.io.LongWritable;
                 + "unit - generalization unit: must be a positive integer",
         extended = "Example:\n")
 public class UDFGeneralization extends UDF {
-  private double evaluate(double data, int mode, int unit) {
-    double result = 0;
-    if (mode == 0) {
-      result = Math.floor(data/unit)*unit;
-    }
-    else {
-      result = Math.ceil(data/unit)*unit;
-    }
-    return result;
-  }
-
   /**
    * Integer version
    */
@@ -37,28 +27,10 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    double dataVal = data.get();
+    int dataVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    IntWritable result = new IntWritable();
-    if (modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if (unitVal <= 0) {
-      throw new RuntimeException("unit must be a positive integer");
-    }
-    // calculate the result in double type
-    double resultDouble = evaluate(dataVal,modeVal,unitVal);
-    // type transform with boundary detection
-    if(resultDouble > (double)Integer.MAX_VALUE) {
-      result.set(Integer.MAX_VALUE);
-    }
-    else if(resultDouble < (double)Integer.MIN_VALUE) {
-      result.set(Integer.MIN_VALUE);
-    }
-    else {
-      result.set((int)resultDouble);
-    }
+    IntWritable result = new IntWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
     return result;
   }
 
@@ -72,14 +44,7 @@ public class UDFGeneralization extends UDF {
     double dataVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    DoubleWritable result = new DoubleWritable();
-    if (modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if (unitVal <= 0) {
-      throw new RuntimeException("unit must be a positive integer");
-    }
-    result.set(evaluate(dataVal,modeVal,unitVal));
+    DoubleWritable result = new DoubleWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
     return result;
   }
 
@@ -90,17 +55,10 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    double dataVal = data.get();
+    float dataVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    FloatWritable result = new FloatWritable();
-    if (modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if (unitVal <= 0) {
-      throw new RuntimeException("unit must be a positive integer");
-    }
-    result.set((float)evaluate(dataVal,modeVal,unitVal));
+    FloatWritable result = new FloatWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
     return result;
   }
 
@@ -111,28 +69,10 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    double dataVal = data.get();
+    byte dataVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    ByteWritable result = new ByteWritable();
-    if (modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if (unitVal <= 0) {
-      throw new RuntimeException("unit must be a positive integer");
-    }
-    // calculate the result in double type
-    double resultDouble = evaluate(dataVal,modeVal,unitVal);
-    // type transform with boundary detection
-    if(resultDouble > (double)Byte.MAX_VALUE) {
-      result.set(Byte.MAX_VALUE);
-    }
-    else if(resultDouble < (double)Byte.MIN_VALUE) {
-      result.set(Byte.MIN_VALUE);
-    }
-    else {
-      result.set((byte)resultDouble);
-    }
+    ByteWritable result = new ByteWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
     return result;
   }
 
@@ -143,28 +83,10 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    double dataVal = data.get();
+    long dataVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    LongWritable result = new LongWritable();
-    if (modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if (unitVal <= 0) {
-      throw new RuntimeException("unit must be a positive integer");
-    }
-    // calculate the result in double type
-    double resultDouble = evaluate(dataVal,modeVal,unitVal);
-    // type transform with boundary detection
-    if(resultDouble > (double)Long.MAX_VALUE) {
-      result.set(Long.MAX_VALUE);
-    }
-    else if(resultDouble < (double)Long.MIN_VALUE) {
-      result.set(Long.MIN_VALUE);
-    }
-    else {
-      result.set((long)resultDouble);
-    }
+    LongWritable result = new LongWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
     return result;
   }
 
@@ -175,28 +97,10 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    double dataVal = data.get();
+    short dataVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    ShortWritable result = new ShortWritable();
-    if (modeVal != 0 && modeVal != 1) {
-      throw new RuntimeException("mode must be 0 or 1");
-    }
-    if (unitVal <= 0) {
-      throw new RuntimeException("unit must be a positive integer");
-    }
-    // calculate the result in double type
-    double resultDouble = evaluate(dataVal,modeVal,unitVal);
-    // type transform with boundary detection
-    if(resultDouble > (double)Short.MAX_VALUE) {
-      result.set(Short.MAX_VALUE);
-    }
-    else if(resultDouble < (double)Short.MIN_VALUE) {
-      result.set(Short.MIN_VALUE);
-    }
-    else {
-      result.set((short)resultDouble);
-    }
+    ShortWritable result = new ShortWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
     return result;
   }
 
