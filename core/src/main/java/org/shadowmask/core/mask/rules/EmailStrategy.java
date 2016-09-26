@@ -3,6 +3,9 @@ package org.shadowmask.core.mask.rules;
 public class EmailStrategy extends MaskEngineStrategy {
   @Override
   public String evaluate(String value, int mask) {
+    if(mask < 0 || mask >3) {
+      throw new RuntimeException("mask code for Email must between 0 and 3!");
+    }
     String result = "";
     switch(mask) {
       case 0:

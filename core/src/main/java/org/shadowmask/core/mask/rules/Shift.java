@@ -91,7 +91,7 @@ public class Shift {
         // fill 0
         case 0: result = data << digit; break;
         // fill 1
-        case 1: result = data << digit + 1 << digit - 1; break;
+        case 1: result = (data << digit) + ((1L << digit) - 1); break;
         default:
       }
     }
@@ -121,7 +121,15 @@ public class Shift {
    */
   public static short evaluate(short data, int direction, int digit, int mode) {
     checkParameter(direction, digit, mode, DataType.SHORT);
-    short result = (short)shiftCalculate((int)data, direction, digit, mode);
+    short result;
+    if (mode == 1) {
+      result = (short) shiftCalculate((int) data, direction, digit, mode);
+    }
+    // Fill the MSB with zeros when doing unsigned shift
+    else {
+      int dataInt = (int)data & ((1<<16) - 1);
+      result = (short) shiftCalculate(dataInt, direction, digit, mode);
+    }
     return result;
   }
 
@@ -130,7 +138,15 @@ public class Shift {
    */
   public static byte evaluate(byte data, int direction, int digit, int mode) {
     checkParameter(direction, digit, mode, DataType.BYTE);
-    byte result = (byte)shiftCalculate((int)data, direction, digit, mode);
+    byte result;
+    if (mode == 1) {
+      result = (byte) shiftCalculate((int) data, direction, digit, mode);
+    }
+    // Fill the MSB with zeros when doing unsigned shift
+    else {
+      int dataInt = (int)data & ((1<<8) - 1);
+      result = (byte) shiftCalculate(dataInt, direction, digit, mode);
+    }
     return result;
   }
 }

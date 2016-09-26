@@ -22,9 +22,11 @@ public class Generalization {
   public static double evaluate(double data, int mode, int unit) {
     double result = 0;
     checkParameter(mode, unit);
+    // floor
     if (mode == 0) {
       result = Math.floor(data/unit)*unit;
     }
+    // ceil
     else {
       result = Math.ceil(data/unit)*unit;
     }
@@ -36,15 +38,15 @@ public class Generalization {
    */
   public static int evaluate(int data, int mode, int unit) {
     int result = 0;
-    // calculate the result in double type
-    double resultDouble = evaluate((double)data, mode, unit);
+    // calculate the result in long type
+    long resultLong = evaluate((long)data, mode, unit);
     // type transform with boundary detection
-    if (resultDouble > (double) Integer.MAX_VALUE) {
+    if (resultLong > (long) Integer.MAX_VALUE) {
       result = Integer.MAX_VALUE;
-    } else if (resultDouble < (double) Integer.MIN_VALUE) {
+    } else if (resultLong < (long) Integer.MIN_VALUE) {
       result = Integer.MIN_VALUE;
     } else {
-      result = (int) resultDouble;
+      result = (int) resultLong;
     }
     return result;
   }
@@ -62,17 +64,17 @@ public class Generalization {
    */
   public static byte evaluate(byte data, int mode, int unit) {
     byte result = 0;
-    // calculate the result in double type
-    double resultDouble = evaluate((double)data, mode, unit);
+    // calculate the result in long type
+    long resultLong = evaluate((long)data, mode, unit);
     // type transform with boundary detection
-    if(resultDouble > (double) Byte.MAX_VALUE) {
+    if(resultLong > (long) Byte.MAX_VALUE) {
       result = Byte.MAX_VALUE;
     }
-    else if(resultDouble < (double) Byte.MIN_VALUE) {
+    else if(resultLong < (long) Byte.MIN_VALUE) {
       result = Byte.MIN_VALUE;
     }
     else {
-      result = (byte) resultDouble;
+      result = (byte) resultLong;
     }
     return result;
   }
@@ -82,17 +84,31 @@ public class Generalization {
    */
   public static long evaluate(long data, int mode, int unit) {
     long result = 0;
-    // calculate the result in double type
-    double resultDouble = evaluate((double)data, mode, unit);
-    // type transform with boundary detection
-    if(resultDouble > (double) Long.MAX_VALUE) {
-      result = Long.MAX_VALUE;
+    checkParameter(mode,unit);
+    result = data / unit;
+    result *= unit;
+    long remainder = data % unit;
+    // floor
+    if(mode == 0) {
+      if(remainder < 0) {
+        if(result - Long.MIN_VALUE < unit) { //result will exceeds MIN_VALUE after floor operation
+          result = Long.MIN_VALUE;
+        }
+        else {
+          result -= unit;
+        }
+      }
     }
-    else if(resultDouble < (double) Long.MIN_VALUE) {
-      result = Long.MIN_VALUE;
-    }
+    // ceil
     else {
-      result = (long) resultDouble;
+      if(remainder > 0) {
+        if(Long.MAX_VALUE - result < unit) { //result will exceeds MAX_VALUE after ceil operation
+          result = Long.MAX_VALUE;
+        }
+        else {
+          result += unit;
+        }
+      }
     }
     return result;
   }
@@ -102,17 +118,17 @@ public class Generalization {
    */
   public static short evaluate(short data, int mode, int unit) {
     short result = 0;
-    // calculate the result in double type
-    double resultDouble = evaluate((double)data, mode, unit);
+    // calculate the result in long type
+    long resultLong = evaluate((long)data, mode, unit);
     // type transform with boundary detection
-    if(resultDouble > (double) Long.MAX_VALUE) {
+    if(resultLong > (long) Short.MAX_VALUE) {
       result = Short.MAX_VALUE;
     }
-    else if(resultDouble < (double) Long.MIN_VALUE) {
+    else if(resultLong < (long) Short.MIN_VALUE) {
       result = Short.MIN_VALUE;
     }
     else {
-      result = (short) resultDouble;
+      result = (short) resultLong;
     }
     return result;
   }

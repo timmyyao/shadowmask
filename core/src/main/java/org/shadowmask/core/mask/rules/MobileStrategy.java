@@ -7,7 +7,9 @@ public class MobileStrategy extends MaskEngineStrategy {
     String sMask = Integer.toBinaryString(mask);
     char [] cMask = sMask.toCharArray();
     String [] subs = new String[3];
-    if (subs.length < cMask.length) return mobile;
+    if (subs.length < cMask.length) {
+      throw new RuntimeException("Please input correct mask code!");
+    }
     int distance = subs.length - cMask.length;
 
     subs[0] = mobile.substring(0, 3);
