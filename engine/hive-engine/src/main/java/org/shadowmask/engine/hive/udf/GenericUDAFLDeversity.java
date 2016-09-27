@@ -51,7 +51,7 @@ import org.apache.hadoop.io.Text;
 
 /**
  * GenericUDAFLDeversity.
- * _FUNC_(col1, col2, ...) : Calculate the K-Anonymity of col1, col2, ...
+ * _FUNC_(keyNum, key1, key2, ..., value1, value2, ...) : Calculate the L-Deversity
  */
 public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 

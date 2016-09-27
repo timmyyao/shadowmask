@@ -72,18 +72,18 @@ public class AESCipher extends CipherEngine {
       try {
         skey_spec_ = new SecretKeySpec(key.toString().getBytes("UTF-8"), this.method);
       } catch(UnsupportedEncodingException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
 
       String result = null;
       switch(mode) {
         case Cipher.ENCRYPT_MODE:
           result = encrypt(content.getBytes());
-          System.out.println("Encrypted text is " + result.toString());
+          //System.out.println("Encrypted text is " + result.toString());
           break;
         case Cipher.DECRYPT_MODE:
           result = decrypt(Base64.getDecoder().decode(content.toString()));
-          System.out.println("Decrypted text is " + result.toString());
+          //System.out.println("Decrypted text is " + result.toString());
           break;
         default:
           throw new RuntimeException("Unknown mode! [1: encryption, 2: decryption]");
@@ -101,7 +101,7 @@ public class AESCipher extends CipherEngine {
         result = Base64.getEncoder().encodeToString(aesCipher.doFinal(content));
         return result;
       } catch (Exception e) {
-        throw new RuntimeException("There is exception in encrypt!");
+        throw new RuntimeException(e);
       }
     }
 
