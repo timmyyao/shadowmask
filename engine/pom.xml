@@ -4,6 +4,7 @@
     <groupId>org.shadowmask</groupId>
     <artifactId>shadowmask</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.shadowmask</groupId>
@@ -16,5 +17,13 @@
   <modules>
     <module>hive-engine</module>
   </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.shadowmask</groupId>
+      <artifactId>shadowmask-core</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
 </project>
