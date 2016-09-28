@@ -1,6 +1,6 @@
 /**
- * 用户中心api
- * 手机登录，验证码，faq，修改个人信息。
+ * WebApi
+ * apis for webUI
  *
  * OpenAPI spec version: 1.0.0
  * Contact: apiteam@swagger.io
@@ -52,10 +52,10 @@ class SwaggerApp extends Swagger(apiInfo = ApiSwagger.apiInfo, apiVersion = "1.0
 
 object ApiSwagger {
   val apiInfo = ApiInfo(
-    """用户中心api""",
-    """手机登录，验证码，faq，修改个人信息。""",
+    """WebApi""",
+    """apis for webUI""",
     """http://swagger.io""",
-    """apiteam@swagger.io""",
+    """liyinhui1@wanda.cn""",
     """All rights reserved""",
     """http://apache.org/licenses/LICENSE-2.0.html""")
 }
