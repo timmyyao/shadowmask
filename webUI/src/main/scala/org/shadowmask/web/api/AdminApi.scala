@@ -29,14 +29,14 @@ import org.scalatra.ScalatraServlet
 import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.FileUploadSupport
 import org.scalatra.swagger._
-import org.shadowmask.web.common.user.{PlainAuthProvider, User}
+import org.shadowmask.web.common.user.{ConfiguredAuthProvider, User}
 import org.shadowmask.web.model.{LoginResult, LoginResultData}
 
 class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
   with FileUploadSupport
   with JacksonJsonSupport
   with SwaggerSupport
-  with PlainAuthProvider {
+  with ConfiguredAuthProvider {
 
   protected implicit val jsonFormats: Formats = DefaultFormats
 

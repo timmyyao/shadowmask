@@ -29,6 +29,11 @@ case class Token(token: String)
   */
 case class User(username: String, password: String)
 
+/*----------------------------------------------------------------
+  Auth strategy
+ ----------------------------------------------------------------*/
+
+
 /**
   *
   */
@@ -67,11 +72,44 @@ object PlainUserAuth {
   def apply (): PlainUserAuth = instance
 }
 
+
+class LdapServerAuth private extends UserAuth{
+  override def auth(user: Option[User]): Option[Token] = ???
+  override def verify(token: Option[Token]): Option[User] = ???
+}
+
+class MockLdapServerAuth private extends UserAuth{
+  override def auth(user: Option[User]): Option[Token] = PlainUserAuth().auth(user)
+  override def verify(token: Option[Token]): Option[User] = PlainUserAuth().verify(token)
+}
+
+object MockLdapServerAuth {
+  val instance = new MockLdapServerAuth
+  def apply (): MockLdapServerAuth = instance
+}
+
+/*----------------------------------------------------------------
+  Auth strategy
+ ----------------------------------------------------------------*/
+
+
+
 /**
   * user auth provider
   */
-trait PlainAuthProvider {
-  def getAuth(): PlainUserAuth = PlainUserAuth()
+trait AuthProvider{
+  def getAuth:UserAuth
+}
+trait PlainAuthProvider extends AuthProvider{
+  def getAuth() = PlainUserAuth()
+}
+trait ConfiguredAuthProvider extends AuthProvider{
+  def getAuth() ={
+    ShadowmaskProp().authType match {
+      case "ldap" => MockLdapServerAuth()
+      case "plain"=>  PlainUserAuth()
+    }
+  }
 }
 
 
@@ -102,10 +140,27 @@ class ConfiguredUsers private {
 
 object ConfiguredUsers {
   val instance = new ConfiguredUsers
-
   def apply() = instance
 }
+///////////ldap properties ////
+class LdapProp  private (val url:String)
+object LdapProp{
+  val instance = new LdapProp({
+    val resource = ResourceBundle.getBundle("ldap")
+    resource.getString("user.auth.ldap.ldapserver")
+  })
+  def apply(): LdapProp = instance
+}
 
+/////////////shadow mask properties /////////////
+class ShadowmaskProp private (val authType:String)
+object ShadowmaskProp{
+  val instance = new ShadowmaskProp({
+    val resource = ResourceBundle.getBundle("shadowmask")
+    resource.getString("user.auth.method")
+  })
+  def apply(): ShadowmaskProp = instance
+}
 
 
 
