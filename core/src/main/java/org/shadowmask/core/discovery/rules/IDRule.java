@@ -21,9 +21,13 @@ public class IDRule extends IdentifierRule {
 
         if (value.length() == 18) {
             boolean result = true;
-            for (int i=0; i<value.length(); i++) {
+            int i;
+            for (i=0; i<value.length()-1; i++) {
                 result = result && DiscoveryUtil.isDigitChar(value.charAt(i));
             }
+            // last digit of ID code may be 'x' or 'X'
+            result = result && (DiscoveryUtil.isDigitChar(value.charAt(i)) ||
+              value.charAt(i) == 'x' || value.charAt(i) == 'X');
             return result;
         }
 
