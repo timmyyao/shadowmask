@@ -23,34 +23,38 @@ import org.shadowmask.core.discovery.RuleContext;
 import org.shadowmask.core.discovery.util.DiscoveryUtil;
 
 /**
- * This rule would evaluate whether the column value is chinese citizen id.
+ * This rule would evaluate whether the column value is a chinese phone number.
  */
-public class IDRule extends IdentifierRule {
+public class PhoneRule extends QusiIdentifierRule{
+  public PhoneRule(RuleContext ruleContext) { super(ruleContext);}
 
-    public IDRule(RuleContext context) {
-        super(context);
+  @Override
+  public boolean evaluate() {
+    if (value == null) {
+      throw new DataDiscoveryException("Should fill the column value before fire inspect rules.");
     }
 
-    @Override
-    public boolean evaluate() {
-        if (value == null) {
-            throw new DataDiscoveryException("Should fill the column value before fire inspect rules.");
-        }
-
-        if (value.length() == 18) {
-            boolean result = true;
-            int i;
-            for (i=0; i<value.length()-1; i++) {
-                result = result && DiscoveryUtil.isDigitChar(value.charAt(i));
-            }
-            // last digit of ID code may be 'x' or 'X'
-            result = result && (DiscoveryUtil.isDigitChar(value.charAt(i)) ||
-              value.charAt(i) == 'x' || value.charAt(i) == 'X');
-            return result;
-        }
-
-        return false;
+    String subs[] = value.split("\\-");
+    // there are 2 parts after splitting by '-', e.g. 021-88888888
+    if (subs.length != 2) {
+      return false;
     }
-
-
+    // 1. all parts consist of only digits;
+    // 2. the first part should be 2, 3 or 4 digits long
+    // 3. the second part should be 7 or 8 digits long
+    if (subs[0].length() > 4 || subs[0].length() < 2) {
+      return false;
+    }
+    if (subs[1].length() > 8 || subs[1].length() < 7) {
+      return false;
+    }
+    for (String sub : subs) {
+      for (int i = 0; i < sub.length(); i ++) {
+        if (DiscoveryUtil.isDigitChar(sub.charAt(i)) == false) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 }
