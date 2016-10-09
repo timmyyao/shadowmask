@@ -18,7 +18,7 @@
 
 package org.shadowmask.core.mask.rules.generalizer.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
