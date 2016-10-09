@@ -18,6 +18,12 @@
     <jetty.version>9.3.11.M0</jetty.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.shadowmask</groupId>
+      <artifactId>hive-engine</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+
     <!--scalatra-->
     <dependency>
       <groupId>org.scalatra</groupId>

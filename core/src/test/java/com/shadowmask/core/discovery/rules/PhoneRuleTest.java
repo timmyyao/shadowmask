@@ -49,7 +49,7 @@ public class PhoneRuleTest {
     rule.setColumnValue("1-66666666");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("1345-66666666");
-    assertEquals(false, rule.evaluate());
+    assertEquals(true, rule.evaluate());
     rule.setColumnValue("66666666");
     assertEquals(false, rule.evaluate());
   }
