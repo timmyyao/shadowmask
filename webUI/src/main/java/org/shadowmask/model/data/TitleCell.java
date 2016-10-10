@@ -1,3 +1,4 @@
+package org.shadowmask.model.data;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +17,14 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection;
+public class TitleCell implements Cell{
+    public String columnName;
+    public TitleType type;
+    public String showName;
 
-import java.sql.Connection;
-
-public interface ConnectionProvider extends Supplier<Connection> {
+    public TitleCell(String columnName, TitleType type, String showName) {
+        this.columnName = columnName;
+        this.type = type;
+        this.showName = showName;
+    }
 }

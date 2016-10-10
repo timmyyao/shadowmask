@@ -1,3 +1,5 @@
+package org.shadowmask.model.data;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +18,27 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection;
+public class Table {
 
-import java.sql.Connection;
+    private TitleCell[] titleCells;
+    private DataCell[][] dataCells;
 
-public interface ConnectionProvider extends Supplier<Connection> {
+    public Table(int row, int cloumn) {
+        titleCells = new TitleCell[cloumn];
+        dataCells = new DataCell[row][cloumn];
+    }
+
+    public void setTitle(int c,TitleCell titleCell){
+        this.titleCells[c] = titleCell;
+    }
+
+
+    public DataCell get(int r, int c) {
+        return dataCells[r][c];
+    }
+
+    public void set(int r, int c, DataCell cell) {
+        dataCells[r][c] = cell;
+    }
+
 }

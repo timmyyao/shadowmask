@@ -42,6 +42,57 @@
           }
         }
       }
+    },
+    "/data/schema": {
+      "get": {
+        "summary": "Adminstrator login api",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "formData",
+            "description": "hive,spark,etc",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return the schema data",
+            "schema": {
+              "$ref": "#/definitions/SchemaResult"
+            }
+          }
+        }
+      }
+    },
+    "/data/table": {
+      "get": {
+        "summary": "get n-first record of a table",
+        "parameters": [
+          {
+            "name": "table",
+            "in": "formData",
+            "description": "table name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "rows",
+            "in": "formData",
+            "description": "how many rows will get",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/TableResult"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -63,6 +114,96 @@
       "type": "object",
       "properties": {
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "SchemaResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaObject"
+          }
+        }
+      }
+    },
+    "SchemaObject": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "showName": {
+          "type": "string"
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TableProp"
+          }
+        }
+      }
+    },
+    "TableProp": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "showName": {
+          "type": "string"
+        }
+      }
+    },
+    "TableResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/TableContent"
+        }
+      }
+    },
+    "TableContent": {
+      "type": "object",
+      "properties": {
+        "titles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TableTitle"
+          }
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "TableTitle": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "showName": {
           "type": "string"
         }
       }

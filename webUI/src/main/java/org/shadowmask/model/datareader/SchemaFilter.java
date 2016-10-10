@@ -1,3 +1,5 @@
+package org.shadowmask.model.datareader;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +18,12 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection;
+import org.shadowmask.model.data.Schema;
 
-import java.sql.Connection;
 
-public interface ConnectionProvider extends Supplier<Connection> {
+/**
+ * schema filter .
+ */
+public interface SchemaFilter extends Filter<Schema> {
+
 }

@@ -1,3 +1,5 @@
+package org.shadowmask.jdbc.connection;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +18,6 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection;
-
-import java.sql.Connection;
-
-public interface ConnectionProvider extends Supplier<Connection> {
+public interface Supplier<T> {
+    T get();
 }

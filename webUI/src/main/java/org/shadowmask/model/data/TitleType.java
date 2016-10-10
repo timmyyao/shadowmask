@@ -1,3 +1,5 @@
+package org.shadowmask.model.data;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +18,18 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection;
+public enum TitleType {
+    ID("ID","唯一标示符号"),
+    HALF_ID("HALF_ID","半标示符号"),
+    SENSITIVE("SENSITIVE","敏感数据"),
+    NONE_SENSITIVE("NONE_SENSITIVE","非敏感数据"),
+    UNKNOWN("UNKNOWN","未标记数据");
 
-import java.sql.Connection;
+    public String name;
+    public String desc;
 
-public interface ConnectionProvider extends Supplier<Connection> {
+    TitleType(String name, String desc) {
+        this.name = name;
+        this.desc = desc;
+    }
 }

@@ -1,3 +1,5 @@
+package org.shadowmask.model.datareader;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +18,30 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection;
+import org.shadowmask.model.data.Schema;
+import org.shadowmask.model.data.Table;
+import org.shadowmask.model.data.TableProp;
 
-import java.sql.Connection;
+import java.util.List;
 
-public interface ConnectionProvider extends Supplier<Connection> {
+public class MockDataReader implements IDataReader {
+    @Override
+    public List<Schema> getAllSchema() {
+        return null;
+    }
+
+    @Override
+    public List<Schema> getAllSchema(SchemaFilter filter) {
+        return null;
+    }
+
+    @Override
+    public Table getTable(TableProp tableProp, int fetchRows) {
+        return null;
+    }
+
+    @Override
+    public Table getTable(TableProp tableProp, int fetchRows, TitleCellFilter filter) {
+        return null;
+    }
 }
