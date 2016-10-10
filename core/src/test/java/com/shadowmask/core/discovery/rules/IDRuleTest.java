@@ -32,6 +32,10 @@ public class IDRuleTest {
         rule.setColumnName("id");
         rule.setColumnValue("340001199908180022");
         assertEquals(true, rule.evaluate());
+        rule.setColumnValue("34000119990818002x");
+        assertEquals(true, rule.evaluate());
+        rule.setColumnValue("34000119990818002X");
+        assertEquals(true, rule.evaluate());
     }
 
     @Test
