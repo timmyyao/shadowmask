@@ -41,32 +41,42 @@ import java.util.ResourceBundle;
  * Created by liyh on 16/10/9.
  */
 public class HiveProps {
+    final
     public static ResourceBundle bundle  = ResourceBundle.getBundle("jdbc_hive");
 
+    final
     static
     public String url  = bundle.getString("jdbc.hive.url");
 
+    final
     static
     public String driver = bundle.getString("jdbc.hive.driverClass");
 
+    final
     static
     public String user = bundle.getString("jdbc.hive.user");
 
+    final
     static
     public String password = bundle.getString("jdbc.hive.password");
 
+    final
     static
     public String authMethod = bundle.getString("jdbc.hive.auth.method");
 
+    final
     static
     public String krbRealm = bundle.getString("krb.realm");
 
+    final
     static
     public String krbKDC = bundle.getString("krb.kdc");
 
+    final
     static
     public String krbUser = bundle.getString("krb.user");
 
+    final
     static
     public String krbKeytab = bundle.getString("krb.keytab");
 }
