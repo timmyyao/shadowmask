@@ -22,9 +22,8 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-
-import org.shadowmask.core.mask.rules.MaskEngine;
-import org.shadowmask.core.mask.rules.EmailStrategy;
+import org.shadowmask.core.mask.rules.generalizer.Generalizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.EmailGeneralizer;
 
 /**
  * UDFEmail.
@@ -48,9 +47,9 @@ public class UDFEmail extends UDF {
     String str_email = email.toString();
     Text result = new Text();
 
-    MaskEngine me = new MaskEngine(new EmailStrategy());
+    Generalizer<String, String> generalizer = new EmailGeneralizer();
 
-    result.set(me.evaluate(str_email, mode));
+    result.set(generalizer.generalize(str_email, mode));
     return result;
   }
 }

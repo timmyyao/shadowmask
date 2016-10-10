@@ -21,12 +21,12 @@ package org.shadowmask.engine.hive.udf;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.hive.serde2.io.ByteWritable;
-import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
-import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.shadowmask.core.mask.rules.Generalization;
+import org.apache.hadoop.io.Text;
+import org.shadowmask.core.mask.rules.generalizer.Generalizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.*;
 
 
 /**
@@ -41,42 +41,15 @@ public class UDFGeneralization extends UDF {
   /**
    * Integer version
    */
-  public IntWritable evaluate(IntWritable data, IntWritable mode, IntWritable unit) {
+  public IntWritable evaluate(IntWritable data, IntWritable level, IntWritable unit) {
     if (data == null) {
       return null;
     }
-    int dataVal = data.get();
-    int modeVal = mode.get();
+    int ageVal = data.get();
+    int modeVal = level.get();
     int unitVal = unit.get();
-    IntWritable result = new IntWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
-    return result;
-  }
-
-  /**
-   * Double version
-   */
-  public DoubleWritable evaluate(DoubleWritable data, IntWritable mode, IntWritable unit) {
-    if (data == null) {
-      return null;
-    }
-    double dataVal = data.get();
-    int modeVal = mode.get();
-    int unitVal = unit.get();
-    DoubleWritable result = new DoubleWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
-    return result;
-  }
-
-  /**
-   * Float version
-   */
-  public FloatWritable evaluate(FloatWritable data, IntWritable mode, IntWritable unit) {
-    if (data == null) {
-      return null;
-    }
-    float dataVal = data.get();
-    int modeVal = mode.get();
-    int unitVal = unit.get();
-    FloatWritable result = new FloatWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
+    Generalizer<Integer, Integer> generalizer = new IntGeneralizer(unitVal);
+    IntWritable result = new IntWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
@@ -87,10 +60,11 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    byte dataVal = data.get();
+    byte ageVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    ByteWritable result = new ByteWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
+    Generalizer<Byte, Byte> generalizer = new ByteGeneralizer(unitVal);
+    ByteWritable result = new ByteWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
@@ -101,10 +75,11 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    long dataVal = data.get();
+    long ageVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    LongWritable result = new LongWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
+    Generalizer<Long, Long> generalizer = new LongGeneralizer(unitVal);
+    LongWritable result = new LongWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
@@ -115,12 +90,27 @@ public class UDFGeneralization extends UDF {
     if (data == null) {
       return null;
     }
-    short dataVal = data.get();
+    short ageVal = data.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    ShortWritable result = new ShortWritable(Generalization.evaluate(dataVal, modeVal, unitVal));
+    Generalizer<Short, Short> generalizer = new ShortGeneralizer(unitVal);
+    ShortWritable result = new ShortWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
+  /**
+   * String version
+   */
+  public Text evaluate(Text data, IntWritable mode, IntWritable unit) {
+    if (data == null) {
+      return null;
+    }
+    String ageVal = data.toString();
+    int modeVal = mode.get();
+    int unitVal = unit.get();
+    Generalizer<String, String> generalizer = new StringGeneralizer(unitVal);
+    Text result = new Text(generalizer.generalize(ageVal, modeVal));
+    return result;
+  }
 }
 

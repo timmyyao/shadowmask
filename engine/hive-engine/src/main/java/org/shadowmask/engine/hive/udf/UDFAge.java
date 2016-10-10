@@ -24,7 +24,11 @@ import org.apache.hadoop.hive.serde2.io.ByteWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.shadowmask.core.mask.rules.Generalization;
+import org.shadowmask.core.mask.rules.generalizer.Generalizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.ByteGeneralizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.IntGeneralizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.LongGeneralizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.ShortGeneralizer;
 
 /**
  * UDFAge.
@@ -38,14 +42,15 @@ public class UDFAge extends UDF{
   /**
    * Integer version
    */
-  public IntWritable evaluate(IntWritable age, IntWritable mode, IntWritable unit) {
+  public IntWritable evaluate(IntWritable age, IntWritable level, IntWritable unit) {
     if (age == null) {
       return null;
     }
     int ageVal = age.get();
-    int modeVal = mode.get();
+    int modeVal = level.get();
     int unitVal = unit.get();
-    IntWritable result = new IntWritable(Generalization.evaluate(ageVal, modeVal, unitVal));
+    Generalizer<Integer, Integer> generalizer = new IntGeneralizer(unitVal);
+    IntWritable result = new IntWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
@@ -59,7 +64,8 @@ public class UDFAge extends UDF{
     byte ageVal = age.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    ByteWritable result = new ByteWritable(Generalization.evaluate(ageVal, modeVal, unitVal));
+    Generalizer<Byte, Byte> generalizer = new ByteGeneralizer(unitVal);
+    ByteWritable result = new ByteWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
@@ -73,7 +79,8 @@ public class UDFAge extends UDF{
     long ageVal = age.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    LongWritable result = new LongWritable(Generalization.evaluate(ageVal, modeVal, unitVal));
+    Generalizer<Long, Long> generalizer = new LongGeneralizer(unitVal);
+    LongWritable result = new LongWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 
@@ -87,7 +94,8 @@ public class UDFAge extends UDF{
     short ageVal = age.get();
     int modeVal = mode.get();
     int unitVal = unit.get();
-    ShortWritable result = new ShortWritable(Generalization.evaluate(ageVal, modeVal, unitVal));
+    Generalizer<Short, Short> generalizer = new ShortGeneralizer(unitVal);
+    ShortWritable result = new ShortWritable(generalizer.generalize(ageVal, modeVal));
     return result;
   }
 }

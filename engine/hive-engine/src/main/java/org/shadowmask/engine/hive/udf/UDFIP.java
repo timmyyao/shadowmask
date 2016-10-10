@@ -23,8 +23,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
-import org.shadowmask.core.mask.rules.MaskEngine;
-import org.shadowmask.core.mask.rules.IPStrategy;
+import org.shadowmask.core.mask.rules.generalizer.impl.IPGeneralizer;
 
 /**
  * UDFIP.
@@ -43,8 +42,8 @@ public class UDFIP extends UDF {
     String str_ip = ip.toString();
 
     Text result = new Text();
-    MaskEngine me = new MaskEngine(new IPStrategy());
-    result.set(me.evaluate(str_ip, mode));
+    IPGeneralizer me = new IPGeneralizer();
+    result.set(me.generalize(str_ip, mode));
     return result;
   }
 }

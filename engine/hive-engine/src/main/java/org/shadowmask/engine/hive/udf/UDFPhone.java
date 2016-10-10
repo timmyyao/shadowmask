@@ -22,9 +22,8 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-
-import org.shadowmask.core.mask.rules.MaskEngine;
-import org.shadowmask.core.mask.rules.PhoneStrategy;
+import org.shadowmask.core.mask.rules.generalizer.Generalizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.PhoneGeneralizer;
 
 /**
  * UDFPhone.
@@ -48,8 +47,8 @@ public class UDFPhone extends UDF {
     String str_phone = phone.toString();
 
     Text result = new Text();
-    MaskEngine me = new MaskEngine(new PhoneStrategy());
-    result.set(me.evaluate(str_phone, mode));
+    Generalizer<String, String> generalizer = new PhoneGeneralizer();
+    result.set(generalizer.generalize(str_phone, mode));
     return result;
   }
 }

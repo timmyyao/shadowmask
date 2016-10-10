@@ -22,7 +22,8 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.shadowmask.core.mask.rules.Mask;
+import org.shadowmask.core.mask.rules.generalizer.Generalizer;
+import org.shadowmask.core.mask.rules.generalizer.impl.ShadeGeneralizer;
 
 
 /**
@@ -37,13 +38,15 @@ import org.shadowmask.core.mask.rules.Mask;
 public class UDFMask extends UDF{
   private final Text result = new Text();
 
-  public Text evaluate(Text data, IntWritable start, IntWritable end, Text tag) {
+  public Text evaluate(Text data, IntWritable level, Text tag) {
     // returns null when input is null
     if(data == null){
       return null;
     }
 
-    result.set(Mask.evalutate(data.toString(), start.get(), end.get(), tag.toString()));
+    Generalizer<String, String> generalizer = new ShadeGeneralizer(tag.toString().charAt(0));
+
+    result.set(generalizer.generalize(data.toString(), level.get()));
     return result;
   }
 }

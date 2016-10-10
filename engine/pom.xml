@@ -16,6 +16,7 @@
 
   <modules>
     <module>hive-engine</module>
+    <module>spark-engine</module>
   </modules>
 
   <dependencies>
