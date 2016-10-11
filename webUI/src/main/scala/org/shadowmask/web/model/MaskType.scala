@@ -24,8 +24,6 @@
 
 package org.shadowmask.web.model
 
-import com.wordnik.client.model.MaskRule
-
 
 case class MaskType (
   id: Option[String],

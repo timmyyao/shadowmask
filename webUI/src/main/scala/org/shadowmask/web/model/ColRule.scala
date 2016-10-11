@@ -24,8 +24,6 @@
 
 package org.shadowmask.web.model
 
-import com.wordnik.client.model.ColRule_rule
-
 
 case class ColRule (
   colName: Option[String],

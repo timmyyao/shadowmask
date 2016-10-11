@@ -24,8 +24,6 @@
 
 package org.shadowmask.web.model
 
-import com.wordnik.client.model.ColRule
-
 
 case class MaskRequest (
   dsType: Option[String],  // HIVE,SPARK,etc

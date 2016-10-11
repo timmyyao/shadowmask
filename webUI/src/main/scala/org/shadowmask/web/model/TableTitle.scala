@@ -26,5 +26,6 @@ package org.shadowmask.web.model
 
 case class TableTitle (
   name: Option[String],
-showName: Option[String]
+showName: Option[String],
+cloumnType: Option[String]  // ID,HALF_ID,SENSITIVE,NONE_SENSITIVE,UNKNOWN
 )

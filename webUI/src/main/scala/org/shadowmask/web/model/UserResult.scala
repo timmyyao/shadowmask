@@ -24,8 +24,6 @@
 
 package org.shadowmask.web.model
 
-import com.wordnik.client.model.UserItem
-
 
 case class UserResult (
   code: Option[Int],

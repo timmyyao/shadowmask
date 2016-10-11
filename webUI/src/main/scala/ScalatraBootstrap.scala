@@ -20,7 +20,7 @@ import javax.servlet.ServletContext
 
 import akka.actor.ActorSystem
 import org.scalatra.LifeCycle
-import org.shadowmask.web.api.{AdminApi, DataApi}
+import org.shadowmask.web.api.{AdminApi, DataApi, WarehouseApi}
 
 class ScalatraBootstrap extends LifeCycle {
   implicit val swagger = new SwaggerApp
@@ -30,6 +30,7 @@ class ScalatraBootstrap extends LifeCycle {
     try {
       context mount (new AdminApi(), "/admin/*")
       context mount (new DataApi(), "/data/*")
+      context mount (new WarehouseApi(), "/warehouse/*")
       context mount (new ResourcesApp, "/api-docs/*")
     } catch {
       case e: Throwable => e.printStackTrace()

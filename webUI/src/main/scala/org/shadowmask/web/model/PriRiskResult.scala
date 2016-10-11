@@ -24,8 +24,6 @@
 
 package org.shadowmask.web.model
 
-import com.wordnik.client.model.RiskItems
-
 
 case class PriRiskResult (
   code: Option[Int],

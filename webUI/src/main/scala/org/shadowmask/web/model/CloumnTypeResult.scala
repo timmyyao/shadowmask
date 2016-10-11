@@ -24,8 +24,6 @@
 
 package org.shadowmask.web.model
 
-import com.wordnik.client.model.CloumnType
-
 
 case class CloumnTypeResult (
   code: Option[Int],
