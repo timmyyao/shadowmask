@@ -1,3 +1,5 @@
+package org.shadowmask.model.data;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,24 +18,18 @@
  * limitations under the License.
  */
 
-import javax.servlet.ServletContext
+public enum TitleType {
+    ID("ID","唯一标示符号"),
+    HALF_ID("HALF_ID","半标示符号"),
+    SENSITIVE("SENSITIVE","敏感数据"),
+    NONE_SENSITIVE("NONE_SENSITIVE","非敏感数据"),
+    UNKNOWN("UNKNOWN","未标记数据");
 
-import akka.actor.ActorSystem
-import org.scalatra.LifeCycle
-import org.shadowmask.web.api.{AdminApi, DataApi, WarehouseApi}
+    public String name;
+    public String desc;
 
-class ScalatraBootstrap extends LifeCycle {
-  implicit val swagger = new SwaggerApp
-
-  override def init(context: ServletContext) {
-    implicit val system = ActorSystem("appActorSystem")
-    try {
-      context mount (new AdminApi(), "/admin/*")
-      context mount (new DataApi(), "/data/*")
-      context mount (new WarehouseApi(), "/warehouse/*")
-      context mount (new ResourcesApp, "/api-docs/*")
-    } catch {
-      case e: Throwable => e.printStackTrace()
+    TitleType(String name, String desc) {
+        this.name = name;
+        this.desc = desc;
     }
-  }
 }

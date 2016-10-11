@@ -1,3 +1,5 @@
+package org.shadowmask.model.datareader;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,24 +18,30 @@
  * limitations under the License.
  */
 
-import javax.servlet.ServletContext
+import org.shadowmask.model.data.Schema;
+import org.shadowmask.model.data.Table;
+import org.shadowmask.model.data.TableProp;
 
-import akka.actor.ActorSystem
-import org.scalatra.LifeCycle
-import org.shadowmask.web.api.{AdminApi, DataApi, WarehouseApi}
+import java.util.List;
 
-class ScalatraBootstrap extends LifeCycle {
-  implicit val swagger = new SwaggerApp
-
-  override def init(context: ServletContext) {
-    implicit val system = ActorSystem("appActorSystem")
-    try {
-      context mount (new AdminApi(), "/admin/*")
-      context mount (new DataApi(), "/data/*")
-      context mount (new WarehouseApi(), "/warehouse/*")
-      context mount (new ResourcesApp, "/api-docs/*")
-    } catch {
-      case e: Throwable => e.printStackTrace()
+public class MockDataReader implements IDataReader {
+    @Override
+    public List<Schema> getAllSchema() {
+        return null;
     }
-  }
+
+    @Override
+    public List<Schema> getAllSchema(SchemaFilter filter) {
+        return null;
+    }
+
+    @Override
+    public Table getTable(TableProp tableProp, int fetchRows) {
+        return null;
+    }
+
+    @Override
+    public Table getTable(TableProp tableProp, int fetchRows, TitleCellFilter filter) {
+        return null;
+    }
 }

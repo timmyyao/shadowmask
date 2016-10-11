@@ -24,6 +24,8 @@
 
 package org.shadowmask.web.model
 
-case class LoginResultData (
-  token: Option[String]
+
+case class ColRule (
+  colName: Option[String],
+rule: Option[ColRule_rule]
 )
