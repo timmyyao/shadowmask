@@ -24,6 +24,8 @@
 
 package org.shadowmask.web.model
 
-case class LoginResultData (
-  token: Option[String]
+case class MaskRuleParam (
+  name: Option[String],
+desc: Option[String],
+dataType: Option[String]  // will be integer,string, boolean  etc
 )

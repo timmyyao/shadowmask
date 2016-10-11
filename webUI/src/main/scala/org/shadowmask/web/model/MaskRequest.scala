@@ -24,6 +24,13 @@
 
 package org.shadowmask.web.model
 
-case class LoginResultData (
-  token: Option[String]
+
+case class MaskRequest (
+  dsType: Option[String],  // HIVE,SPARK,etc
+dsSchema: Option[String],
+dsTable: Option[String],
+distType: Option[String],  // TABLE,VIEW etc
+distSchema: Option[String],
+distName: Option[String],
+rules: Option[List[ColRule]]
 )

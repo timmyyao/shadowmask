@@ -1,3 +1,4 @@
+package org.shadowmask.model.data;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,24 +17,14 @@
  * limitations under the License.
  */
 
-import javax.servlet.ServletContext
+public class TitleCell implements Cell{
+    public String columnName;
+    public TitleType type;
+    public String showName;
 
-import akka.actor.ActorSystem
-import org.scalatra.LifeCycle
-import org.shadowmask.web.api.{AdminApi, DataApi, WarehouseApi}
-
-class ScalatraBootstrap extends LifeCycle {
-  implicit val swagger = new SwaggerApp
-
-  override def init(context: ServletContext) {
-    implicit val system = ActorSystem("appActorSystem")
-    try {
-      context mount (new AdminApi(), "/admin/*")
-      context mount (new DataApi(), "/data/*")
-      context mount (new WarehouseApi(), "/warehouse/*")
-      context mount (new ResourcesApp, "/api-docs/*")
-    } catch {
-      case e: Throwable => e.printStackTrace()
+    public TitleCell(String columnName, TitleType type, String showName) {
+        this.columnName = columnName;
+        this.type = type;
+        this.showName = showName;
     }
-  }
 }

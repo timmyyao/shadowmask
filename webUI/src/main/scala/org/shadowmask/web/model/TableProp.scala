@@ -24,6 +24,7 @@
 
 package org.shadowmask.web.model
 
-case class LoginResultData (
-  token: Option[String]
+case class TableProp (
+  name: Option[String],
+showName: Option[String]
 )

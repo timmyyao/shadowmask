@@ -24,7 +24,7 @@ import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.FileUploadSupport
 import org.scalatra.swagger._
 import org.shadowmask.web.common.user.{ConfiguredAuthProvider, User}
-import org.shadowmask.web.model.{LoginResult, LoginResultData}
+import org.shadowmask.web.model._
 
 class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
   with FileUploadSupport
@@ -42,14 +42,42 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
+  error{
+    case e:Exception=>
+      e.printStackTrace()
+  }
+
+
+  val adminUsersGetOperation = (apiOperation[UserResult]("adminUsersGet")
+    summary "get all users."
+    parameters(headerParam[String]("authToken").description(""))
+    )
+
+  get("/users",operation(adminUsersGetOperation)) {
+
+
+    val authToken = request.getHeader("authToken")
+
+    println("authToken: " + authToken)
+
+    UserResult(
+      Some(0),
+      Some("ok"),
+      Some(List(
+        UserItem(Some("zhangsan"),Some("张三")),
+        UserItem(Some("xxx"),Some("hdfs")),
+        UserItem(Some("admin"),Some("超管"))
+      ))
+    )
+  }
 
   val adminLoginPostOperation = (apiOperation[LoginResult]("adminLoginPost")
-    summary "Adminstrator login api"
+    summary "Administrator login api"
     parameters(formParam[String]("username").description("administrator'name")
     , formParam[String]("password").description("administrator'password"))
     )
 
-  post("/admin/login", operation(adminLoginPostOperation)) {
+  post("/login", operation(adminLoginPostOperation)) {
     val username = params.getAs[String]("username")
     val password = params.getAs[String]("password")
     val (code, info, loginData) =
@@ -59,5 +87,51 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
       }
     LoginResult(code, info, loginData)
   }
+
+
+  val adminGrantPostOperation = (apiOperation[SimpleResult]("adminGrantPost")
+    summary "grant priviledges."
+    parameters(headerParam[String]("authToken").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""), formParam[String]("user").description(""))
+    )
+
+  post("/grant", operation(adminGrantPostOperation)) {
+
+
+    val authToken = request.getHeader("authToken")
+
+    println("authToken: " + authToken)
+
+
+    val source = params.getAs[String]("source")
+
+    println("source: " + source)
+
+
+    val datasetType = params.getAs[String]("datasetType")
+
+    println("datasetType: " + datasetType)
+
+
+    val schema = params.getAs[String]("schema")
+
+    println("schema: " + schema)
+
+
+    val name = params.getAs[String]("name")
+
+    println("name: " + name)
+
+
+    val user = params.getAs[String]("user")
+
+    println("user: " + user)
+    SimpleResult(Some(1),Some(""));
+  }
+
+
+
+
+
+
 
 }

@@ -1,3 +1,5 @@
+package org.shadowmask.jdbc.connection;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,24 +18,6 @@
  * limitations under the License.
  */
 
-import javax.servlet.ServletContext
-
-import akka.actor.ActorSystem
-import org.scalatra.LifeCycle
-import org.shadowmask.web.api.{AdminApi, DataApi, WarehouseApi}
-
-class ScalatraBootstrap extends LifeCycle {
-  implicit val swagger = new SwaggerApp
-
-  override def init(context: ServletContext) {
-    implicit val system = ActorSystem("appActorSystem")
-    try {
-      context mount (new AdminApi(), "/admin/*")
-      context mount (new DataApi(), "/data/*")
-      context mount (new WarehouseApi(), "/warehouse/*")
-      context mount (new ResourcesApp, "/api-docs/*")
-    } catch {
-      case e: Throwable => e.printStackTrace()
-    }
-  }
+public interface Supplier<T> {
+    T get();
 }

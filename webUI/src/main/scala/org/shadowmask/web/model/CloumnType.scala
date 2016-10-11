@@ -24,6 +24,7 @@
 
 package org.shadowmask.web.model
 
-case class LoginResultData (
-  token: Option[String]
+case class CloumnType (
+  colType: Option[String],  // ID,HALF_ID,SENSITIVE, NONE_SENSITIVE,UNKNOWN
+colDesc: Option[String]
 )
