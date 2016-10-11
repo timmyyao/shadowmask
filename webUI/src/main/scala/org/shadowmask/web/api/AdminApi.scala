@@ -1,3 +1,5 @@
+package org.shadowmask.web.api
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,48 +18,6 @@
  * limitations under the License.
  */
 
-package org.shadowmask.web.api
-
-import org.json4s._
-import org.scalatra.ScalatraServlet
-import org.scalatra.json.JacksonJsonSupport
-import org.scalatra.servlet.FileUploadSupport
-import org.scalatra.swagger._
-import org.shadowmask.web.common.user.{ConfiguredAuthProvider, User}
-import org.shadowmask.web.model.{LoginResult, LoginResultData}
-
-class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
-  with FileUploadSupport
-  with JacksonJsonSupport
-  with SwaggerSupport
-  with ConfiguredAuthProvider {
-
-  protected implicit val jsonFormats: Formats = DefaultFormats
-
-  protected val applicationDescription: String = "AdminApi"
-  override protected val applicationName: Option[String] = Some("admin")
-
-  before() {
-    contentType = formats("json")
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
-  }
-
-
-  val adminLoginPostOperation = (apiOperation[LoginResult]("adminLoginPost")
-    summary "Adminstrator login api"
-    parameters(formParam[String]("username").description("administrator'name")
-    , formParam[String]("password").description("administrator'password"))
-    )
-
-  post("/admin/login", operation(adminLoginPostOperation)) {
-    val username = params.getAs[String]("username")
-    val password = params.getAs[String]("password")
-    val (code, info, loginData) =
-      getAuth().auth(Some(User(username.getOrElse(""), password.getOrElse("")))) match {
-        case Some(token) => (Some(0), Some("successfully"), Some(LoginResultData(Some(token.token))))
-        case _ => (Some(1), Some("failed"), Some(LoginResultData(Some(""))))
-      }
-    LoginResult(code, info, loginData)
-  }
+class AdminApi {
 
 }
