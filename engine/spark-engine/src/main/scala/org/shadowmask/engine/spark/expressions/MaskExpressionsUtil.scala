@@ -1,4 +1,4 @@
-package org.shadowmask.engine.spark.dsl
+package org.shadowmask.engine.spark.expressions
 
 import org.apache.spark.unsafe.types.UTF8String
 import org.shadowmask.core.mask.rules.generalizer.impl.IPGeneralizer

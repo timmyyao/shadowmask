@@ -4,7 +4,7 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.catalyst.expressions.codegen.{GeneratedExpressionCode, CodeGenContext}
 import org.apache.spark.sql.types.{StringType, DateType, AbstractDataType, DataType}
 import org.apache.spark.unsafe.types.UTF8String
-import org.shadowmask.engine.spark.dsl.MaskExpressionsUtil
+import org.shadowmask.engine.spark.expressions.MaskExpressionsUtil
 
 object MaskExpressions {
 
