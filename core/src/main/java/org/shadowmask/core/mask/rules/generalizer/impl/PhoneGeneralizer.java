@@ -40,14 +40,14 @@ public class PhoneGeneralizer implements Generalizer<String, String> {
       return phone;
     }
 
-    if (phone.length() != 11) {
-      throw new MaskRuntimeException("Invalid phone number to generalize:" + phone);
-    }
-
     String [] subs = phone.split("\\-");
 
-    for (int i = 1; i < hierarchyLevel; i++) {
-      subs[ROOT_HIERARCHY_LEVEL - hierarchyLevel] = subs[ROOT_HIERARCHY_LEVEL - hierarchyLevel].replaceAll("\\d", "*");
+    if (subs.length != ROOT_HIERARCHY_LEVEL) {
+      throw new MaskRuntimeException("Invalid input phone to generalize:" + phone);
+    }
+
+    for (int i = 1; i <= hierarchyLevel; i++) {
+      subs[ROOT_HIERARCHY_LEVEL - i] = subs[ROOT_HIERARCHY_LEVEL - i].replaceAll("\\d", "*");
     }
 
     return StringUtils.join(subs, "-");

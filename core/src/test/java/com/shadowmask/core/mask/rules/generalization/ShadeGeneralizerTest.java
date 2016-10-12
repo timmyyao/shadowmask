@@ -40,6 +40,7 @@ public class ShadeGeneralizerTest {
         generalization.generalize("123456789", 6);
     }
 
+    @Test
     public void testShadeGeneralizationWithNull() {
         ShadeGeneralizer generalization = new ShadeGeneralizer(5, '*');
         assertEquals(5, generalization.getRootLevel());
@@ -47,7 +48,8 @@ public class ShadeGeneralizerTest {
         assertNull(generalized);
     }
 
-    public void testShadeGeneralization() {
+    @Test
+    public void testShadeGeneralization1() {
         ShadeGeneralizer generalization = new ShadeGeneralizer(5, '*');
         assertEquals(5, generalization.getRootLevel());
         String input = "123456789";
@@ -63,5 +65,22 @@ public class ShadeGeneralizerTest {
         assertEquals("12345****", generalized4);
         String generalized5 = generalization.generalize(input, 5);
         assertEquals("1234*****", generalized5);
+    }
+
+    @Test
+    public void testShadeGeneralization2() {
+        ShadeGeneralizer generalization = new ShadeGeneralizer(4, '-');
+        assertEquals(4, generalization.getRootLevel());
+        String input = "12";
+        String generalized0 = generalization.generalize(input, 0);
+        assertEquals("12", generalized0);
+        String generalized1 = generalization.generalize(input, 1);
+        assertEquals("1-", generalized1);
+        String generalized2 = generalization.generalize(input, 2);
+        assertEquals("--", generalized2);
+        String generalized3 = generalization.generalize(input, 3);
+        assertEquals("--", generalized3);
+        String generalized4 = generalization.generalize(input, 4);
+        assertEquals("--", generalized4);
     }
 }

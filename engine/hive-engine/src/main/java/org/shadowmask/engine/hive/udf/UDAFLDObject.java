@@ -22,11 +22,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class UDAFLDObject extends UDAFObject {
+public class UDAFLDObject {
+  protected String row_key;
+  protected int count = 0;
   private String sensitive_value;
   private Map<String, Integer> deversities;
+
   public UDAFLDObject(String code, String value) {
-    super(code);
+    count = 1;
+    row_key = code;
     this.sensitive_value = value;
     this.deversities = new HashMap<String, Integer>();
     this.deversities.put(sensitive_value, 1);
@@ -52,12 +56,10 @@ public class UDAFLDObject extends UDAFObject {
     return true;
   }
 
-  @Override
   public String getRow() {
     return row_key;
   }
 
-  @Override
   public Integer getCount() {
     return deversities.size();
   }
@@ -68,6 +70,14 @@ public class UDAFLDObject extends UDAFObject {
 
   public HashMap<String, Integer> getDeversities() {
     return (HashMap<String, Integer>) deversities;
+  }
+
+  public void setCount(Integer count) {
+    this.count = count;
+  }
+
+  public void increase(Integer cnt) {
+    this.count += cnt;
   }
 
 }

@@ -52,7 +52,12 @@ public class ByteGeneralizer implements Generalizer<Byte, Byte> {
         long genSplit = 1;
 
         for(int i=0; i<hierarchyLevel; i++) {
-            genSplit = genSplit * genUnit;
+            if(genSplit <= input || genSplit >= Long.MAX_VALUE/genUnit) {
+                genSplit = genSplit * genUnit;
+            }
+            else {
+                return 0;
+            }
         }
 
         return (byte)(input - input % genSplit);

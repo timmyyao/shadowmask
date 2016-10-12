@@ -18,12 +18,14 @@
 package com.shadowmask.core.mask.rules.suppression;
 
 import org.junit.Test;
+import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.suppressor.impl.AESSuppressor;
 import org.shadowmask.core.mask.rules.suppressor.impl.MappingSuppressor;
 import org.shadowmask.core.mask.rules.suppressor.impl.UUIDSuppressor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 
 public class SuppressorTest {
 
@@ -35,6 +37,9 @@ public class SuppressorTest {
         String suppress3 = uuid.suppress("world");
         assertEquals(suppress1, suppress2);
         assertNotEquals(suppress1, suppress3);
+
+        String suppress4 = uuid.suppress(null);
+        assertNull(suppress4);
     }
 
     @Test
@@ -45,6 +50,9 @@ public class SuppressorTest {
         String suppress3 = suppression.suppress("world");
         assertEquals(suppress1, suppress2);
         assertNotEquals(suppress1, suppress3);
+
+        String suppress4 = suppression.suppress(null);
+        assertNull(suppress4);
     }
 
     @Test
@@ -55,6 +63,15 @@ public class SuppressorTest {
         String suppress3 = suppression.suppress("world");
         assertEquals(suppress1, suppress2);
         assertNotEquals(suppress1, suppress3);
+
+        String suppress4 = suppression.suppress(null);
+        assertNull(suppress4);
+    }
+
+    @Test(expected = MaskRuntimeException.class)
+    public void MappingSuppressionTestWithInvalidParameter() {
+        MappingSuppressor suppression = new MappingSuppressor("invalid");
+        String suppress1 = suppression.suppress("hello");
     }
 
     @Test
@@ -66,6 +83,8 @@ public class SuppressorTest {
         String encrypted3 = suppression.suppress("world");
         assertEquals(encrypted1, encrypted2);
         assertNotEquals(encrypted1, encrypted3);
+        String encrypted4 = suppression.suppress(null);
+        assertNull(encrypted4);
         suppression.initiate(2, "1234567812345678");
         String decrypted1 = suppression.suppress(encrypted1);
         String decrypted2 = suppression.suppress(encrypted2);
@@ -73,5 +92,19 @@ public class SuppressorTest {
         assertEquals("hello", decrypted1);
         assertEquals("hello", decrypted2);
         assertEquals("world", decrypted3);
+        String decrypted4 = suppression.suppress(null);
+        assertNull(decrypted4);
+    }
+
+    @Test(expected = MaskRuntimeException.class)
+    public void AESSuppressionTestWithInvalidParameter1() {
+        AESSuppressor suppression = new AESSuppressor();
+        suppression.initiate(3,"12345678");
+    }
+
+    @Test(expected = MaskRuntimeException.class)
+    public void AESSuppressionTestWithInvalidParameter2() {
+        AESSuppressor suppression = new AESSuppressor();
+        suppression.initiate(1,"123456789");
     }
 }

@@ -40,10 +40,6 @@ public class MobileGeneralizer implements Generalizer<String, String> {
       return mobile;
     }
 
-    if (hierarchyLevel == ROOT_HIERARCHY_LEVEL) {
-      return "*";
-    }
-
     if (mobile.length() != 11) {
       throw new MaskRuntimeException("Invalid mobile number to generalize:" + mobile);
     }
@@ -53,8 +49,8 @@ public class MobileGeneralizer implements Generalizer<String, String> {
     subs[1] = mobile.substring(3, 7);
     subs[2] = mobile.substring(7, 11);
 
-    for (int i = 1; i < hierarchyLevel; i++) {
-        subs[ROOT_HIERARCHY_LEVEL - hierarchyLevel] = subs[ROOT_HIERARCHY_LEVEL - hierarchyLevel].replaceAll("\\d", "*");
+    for (int i = 1; i <= hierarchyLevel; i++) {
+        subs[ROOT_HIERARCHY_LEVEL - i] = subs[ROOT_HIERARCHY_LEVEL - i].replaceAll("\\d", "*");
     }
 
     return StringUtils.join(subs, "");

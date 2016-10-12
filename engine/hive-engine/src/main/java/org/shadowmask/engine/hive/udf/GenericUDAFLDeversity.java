@@ -19,11 +19,8 @@
 package org.shadowmask.engine.hive.udf;
 
 import java.lang.StringBuilder;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -52,6 +49,9 @@ import org.apache.hadoop.io.Text;
 /**
  * GenericUDAFLDeversity.
  * _FUNC_(keyNum, key1, key2, ..., value1, value2, ...) : Calculate the L-Deversity
+ * keyNum: the number of keys (key1, key2, ...)
+ * key: the masked QUSI_IDENTIFIER columns
+ * value: the sensitive columns
  */
 public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 
@@ -139,7 +139,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
           key_str.append(values[i]);
         }
 
-        for (int i = key_columns_num + 1; i < values.length - 1; i++) {
+        for (int i = key_columns_num + 1; i < values.length; i++) {
           value_str.append(values[i]);
         }
 
@@ -151,18 +151,27 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
         txt = uid.evaluate(new Text(value_str.toString()));
         String value = txt.toString();
 
+        key = key_str.toString();
+        value = value_str.toString();
+
         UDAFLDObject sri = new UDAFLDObject(key, value);
         UDAFLDObject v = freqMap.get(sri.getRow());
+        System.out.println(sri.getRow()+"; "+sri.getSensitiveValue());
         if(v == null) {
           sri.setCount(1);
           freqMap.put(sri.getRow(), sri);
+          System.out.println("null:"+sri.getRow()+"; "+sri.getSensitiveValue());
         } else {
           // increase deversities_ or not
+          System.out.println("not null:"+sri.getRow()+"; "+sri.getSensitiveValue());
           HashMap d = v.getDeversities();
-          if (d.get(sri.getSensitiveValue()) == null) {
+          if (!d.containsKey(sri.getSensitiveValue())) {
             d.put(sri.getSensitiveValue(), 1);
           } else {
-            d.putAll(sri.getDeversities());
+            //d.putAll(sri.getDeversities());
+          }
+          for(String kkey : (Set<String>)d.keySet()) {
+            System.out.println("d.key = "+kkey);
           }
         }
       }
@@ -233,26 +242,17 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
         LazyBinaryMap lbm = (LazyBinaryMap)((LazyBinaryStruct)e.getValue()).getField(3);
         Map m = lbm.getMap();
 
-        UDAFLDObject sri = new UDAFLDObject(row, value);
-        sri.setCount(count.get());
-
         // merge all the patial maps
-        UDAFLDObject v = ft.freqMap.get(sri.getRow());
+        UDAFLDObject v = ft.freqMap.get(row);
         if(v == null) {
-          sri.setCount(1);
-          ft.freqMap.put(sri.getRow(), sri);
-        } else {
-          // increase deversities_ or not
-          HashMap d = v.getDeversities();
-          if (d.get(sri.getSensitiveValue()) == null) {
-            // TODO: Currently, always set the count of sensitive columns
-            // as 1, because it's easy to get L value for a kind of class
-            // through the size the corresponding hash map.
-            d.put(sri.getSensitiveValue(), 1);
-          } else {
-            d.putAll(sri.getDeversities());
-          }
+          v = new UDAFLDObject(row, value);
+          ft.freqMap.put(row, v);
         }
+        for(Object sensitiveVal : m.keySet()) {
+          String val = ((Text)sensitiveVal).toString();
+          v.getDeversities().put(val,1);
+        }
+
       }
     }
 

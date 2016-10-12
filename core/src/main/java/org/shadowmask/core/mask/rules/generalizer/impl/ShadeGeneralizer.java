@@ -51,7 +51,7 @@ public class ShadeGeneralizer implements Generalizer<String, String> {
         }
 
         if (input.length() <= hierarchyLevel) {
-            return String.valueOf(shadeChar);
+            return StringUtils.repeat(shadeChar, input.length());
         }
 
         return input.substring(0, input.length() - hierarchyLevel) + StringUtils.repeat(shadeChar, hierarchyLevel);

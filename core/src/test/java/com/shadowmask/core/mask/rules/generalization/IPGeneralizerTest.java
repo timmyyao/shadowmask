@@ -22,6 +22,7 @@ import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.generalizer.impl.IPGeneralizer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class IPGeneralizerTest {
 
@@ -60,5 +61,8 @@ public class IPGeneralizerTest {
         assertEquals("10.*.*.*", generalized3);
         String generalized4 = generalization.generalize(ip, 4);
         assertEquals("*.*.*.*", generalized4);
+
+        String nullGeneralized = generalization.generalize(null, 4);
+        assertNull(nullGeneralized);
     }
 }

@@ -22,6 +22,7 @@ import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.generalizer.impl.EmailGeneralizer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class EmailGeneralizerTest {
 
@@ -39,6 +40,13 @@ public class EmailGeneralizerTest {
         generalization.generalize("lcx", 2);
     }
 
+    @Test(expected = MaskRuntimeException.class)
+    public void testEmailGeneralizationWithInvalidParameter3() {
+        EmailGeneralizer generalization = new EmailGeneralizer();
+        assertEquals(3, generalization.getRootLevel());
+        generalization.generalize("lcx@wanda", 2);
+    }
+
     @Test
     public void testEmailGeneralization() {
         EmailGeneralizer generalization = new EmailGeneralizer();
@@ -51,5 +59,8 @@ public class EmailGeneralizerTest {
         assertEquals("*@*.cn", email2);
         String email3 = generalization.generalize("lcx@wanda.cn", 3);
         assertEquals("*@*.*", email3);
+
+        String nullEmail = generalization.generalize(null, 3);
+        assertNull(nullEmail);
     }
 }

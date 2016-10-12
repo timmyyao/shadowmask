@@ -22,6 +22,7 @@ import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.generalizer.impl.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class BasicGeneralizerTest {
 
@@ -58,6 +59,9 @@ public class BasicGeneralizerTest {
         assertEquals("12345", level4);
         String level5 = generalization.generalize(input, 5);
         assertEquals("1234", level5);
+
+        String nullInput = generalization.generalize(null, 5);
+        assertNull(nullInput);
     }
 
     @Test
@@ -258,6 +262,12 @@ public class BasicGeneralizerTest {
         assertEquals(64, level4);
         byte level5 = generalization.generalize(input, 5);
         assertEquals(64, level5);
+        int max= Integer.MAX_VALUE;
+        int value=Integer.MAX_VALUE/2;
+        int x=value*4;
+        x=value*10;
+        x=value*1000;
+        x=value*value;
     }
 
     @Test
@@ -279,8 +289,9 @@ public class BasicGeneralizerTest {
         assertEquals(0, level5);
     }
 
-    @Test
+    /*@Test
     public void testDoubleGeneralization() {
         System.out.println(2.6 % 1.2);
     }
+    */
 }

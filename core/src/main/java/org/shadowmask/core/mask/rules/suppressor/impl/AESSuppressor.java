@@ -18,6 +18,7 @@
 
 package org.shadowmask.core.mask.rules.suppressor.impl;
 
+import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.suppressor.Suppressor;
 
 import javax.crypto.BadPaddingException;
@@ -76,7 +77,7 @@ public class AESSuppressor implements Suppressor<String, String> {
             result = Base64.getEncoder().encodeToString(aesCipher.doFinal(content));
             return result;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new MaskRuntimeException(e);
         }
     }
 
@@ -87,30 +88,14 @@ public class AESSuppressor implements Suppressor<String, String> {
             aesCipher.init(Cipher.DECRYPT_MODE, skey_spec_, ivspec_);
 
             return new String(aesCipher.doFinal(content));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-            return null;
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-            return null;
+        } catch (Exception e) {
+            throw new MaskRuntimeException(e);
         }
     }
 
     public void initiate(int mode, String key) {
         if (key == null || key != null && (key.length() % 8) != 0) {
-            throw new RuntimeException("Please input correct encrypting/decrypting key!\n" +
+            throw new MaskRuntimeException("Please input correct encrypting/decrypting key!\n" +
                     "Key length is the times of 8!");
         }
 
@@ -122,20 +107,23 @@ public class AESSuppressor implements Suppressor<String, String> {
                 this.mode = mode;
                 break;
             default:
-                throw new RuntimeException("Unknown mode! only support [1: encryption, 2: decryption]");
+                throw new MaskRuntimeException("Unknown mode! only support [1: encryption, 2: decryption]");
         }
 
         // validate key and geberate the secret key
         try {
             skey_spec_ = new SecretKeySpec(key.toString().getBytes("UTF-8"), this.method);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new MaskRuntimeException(e);
         }
     }
 
     @Override
     public String suppress(String input) {
         String result = null;
+        if (input == null) {
+            return null;
+        }
         switch (mode) {
             case Cipher.ENCRYPT_MODE:
                 result = encrypt(input.getBytes());
@@ -144,7 +132,7 @@ public class AESSuppressor implements Suppressor<String, String> {
                 result = decrypt(Base64.getDecoder().decode(input.toString()));
                 break;
             default:
-                throw new RuntimeException("Unknown mode! [1: encryption, 2: decryption]");
+                throw new MaskRuntimeException("Unknown mode! [1: encryption, 2: decryption]");
         }
         return result;
     }
