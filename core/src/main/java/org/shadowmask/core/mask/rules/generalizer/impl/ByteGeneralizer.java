@@ -26,7 +26,7 @@ public class ByteGeneralizer implements Generalizer<Byte, Byte> {
     private int genUnit;
 
     public ByteGeneralizer() {
-        this(String.valueOf(Long.MAX_VALUE).length());
+        this(String.valueOf(Byte.MAX_VALUE).length());
     }
 
     public ByteGeneralizer(int rootHierarchyLevel) {
