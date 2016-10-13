@@ -1,0 +1,30 @@
+ARTIFACTS_KEY=AKIAIPSQQIYAIK63VCEQ
+ARTIFACTS_SECRET=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
+ARTIFACTS_BUCKET=shadowmask-ci
+language:
+  - java
+  - scala
+sudo: false
+before_script:
+  - export MAVEN_SKIP_RC=true
+  - mvn -Xmx32M -v | grep 1.7.0; if [ $? = 0 ]; then export MAVEN_OPTS="-XX:MaxPermSize=240M"; else export MAVEN_OPTS="-XX:MaxMetaspaceSize=240M -XX:CompressedClassSpaceSize=240M"; fi
+  - export MAVEN_OPTS="-Xmx512M $MAVEN_OPTS"
+script:
+  - echo "TRAVIS_PULL_REQUEST" $TRAVIS_PULL_REQUEST
+  - echo "TRAVIS_BRANCH" $TRAVIS_BRANCH
+  - echo "TRAVIS_TAG" $TRAVIS_TAG
+  - echo "repo" $TRAVIS_REPO_SLUG
+jdk:
+  - oraclejdk8
+addons:
+  artifacts: true
+  apt:
+    packages:
+      - oracle-java8-installer
+scala:
+  - 2.11.8
+cache:
+  directories:
+  - $HOME/.m2
+git:
+  depth: 1
