@@ -33,119 +33,121 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class AESSuppressor implements Suppressor<String, String> {
-    private static final int IV_LENGTH = 16;
-    // private static SecureRandom rand = new SecureRandom();
-    // private static byte[] seed = rand.generateSeed(IV_LENGTH);
-    // private static KeyGenerator keygen_;
-    // private static byte[] iv_ = new byte[IV_LENGTH];
-    private static byte[] iv_ = "odjyvjdhgksefncx".getBytes();
-    private static IvParameterSpec ivspec_ = new IvParameterSpec(iv_);
-    private String method = "AES";
-    private SecretKeySpec skey_spec_;
-    private int mode;
+  private static final int IV_LENGTH = 16;
+  // private static SecureRandom rand = new SecureRandom();
+  // private static byte[] seed = rand.generateSeed(IV_LENGTH);
+  // private static KeyGenerator keygen_;
+  // private static byte[] iv_ = new byte[IV_LENGTH];
+  private static byte[] iv_ = "odjyvjdhgksefncx".getBytes();
+  private static IvParameterSpec ivspec_ = new IvParameterSpec(iv_);
+  private String method = "AES";
+  private SecretKeySpec skey_spec_;
+  private int mode;
 
-    public AESSuppressor() {
-        this.method = "AES";
+  public AESSuppressor() {
+    this.method = "AES";
+  }
+
+  /**
+   * ******
+   * static {
+   * try {
+   * keygen_ = KeyGenerator.getInstance(this.method);
+   * <p/>
+   * keygen_.init(128);
+   * skey_ = keygen_.generateKey();
+   * <p/>
+   * rand.setSeed(seed);
+   * rand.nextBytes(iv_);
+   * ivspec_ = new IvParameterSpec(iv_);
+   * } catch(NoSuchAlgorithmException e) {
+   * e.printStackTrace();
+   * }
+   * }
+   * *********
+   */
+
+  protected String encrypt(byte[] content) {
+    String result = null;
+    try {
+      Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      aesCipher.init(Cipher.ENCRYPT_MODE, skey_spec_, ivspec_);
+
+      result = Base64.getEncoder().encodeToString(aesCipher.doFinal(content));
+      return result;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected String decrypt(byte[] content) {
+    try {
+      Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      aesCipher.init(Cipher.DECRYPT_MODE, skey_spec_, ivspec_);
+
+      return new String(aesCipher.doFinal(content));
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+      return null;
+    } catch (InvalidKeyException e) {
+      e.printStackTrace();
+      return null;
+    } catch (InvalidAlgorithmParameterException e) {
+      e.printStackTrace();
+      return null;
+    } catch (NoSuchPaddingException e) {
+      e.printStackTrace();
+      return null;
+    } catch (BadPaddingException e) {
+      e.printStackTrace();
+      return null;
+    } catch (IllegalBlockSizeException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public void initiate(int mode, String key) {
+    if (key == null || key != null && (key.length() % 8) != 0) {
+      throw new RuntimeException(
+          "Please input correct encrypting/decrypting key!\n"
+              + "Key length is the times of 8!");
     }
 
-    /**
-     * ******
-     * static {
-     * try {
-     * keygen_ = KeyGenerator.getInstance(this.method);
-     * <p/>
-     * keygen_.init(128);
-     * skey_ = keygen_.generateKey();
-     * <p/>
-     * rand.setSeed(seed);
-     * rand.nextBytes(iv_);
-     * ivspec_ = new IvParameterSpec(iv_);
-     * } catch(NoSuchAlgorithmException e) {
-     * e.printStackTrace();
-     * }
-     * }
-     * *********
-     */
-
-    protected String encrypt(byte[] content) {
-        String result = null;
-        try {
-            Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            aesCipher.init(Cipher.ENCRYPT_MODE, skey_spec_, ivspec_);
-
-            result = Base64.getEncoder().encodeToString(aesCipher.doFinal(content));
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    switch (mode) {
+    case Cipher.ENCRYPT_MODE:
+      this.mode = mode;
+      break;
+    case Cipher.DECRYPT_MODE:
+      this.mode = mode;
+      break;
+    default:
+      throw new RuntimeException(
+          "Unknown mode! only support [1: encryption, 2: decryption]");
     }
 
-
-    protected String decrypt(byte[] content) {
-        try {
-            Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            aesCipher.init(Cipher.DECRYPT_MODE, skey_spec_, ivspec_);
-
-            return new String(aesCipher.doFinal(content));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-            return null;
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-            return null;
-        }
+    // validate key and geberate the secret key
+    try {
+      skey_spec_ =
+          new SecretKeySpec(key.toString().getBytes("UTF-8"), this.method);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    public void initiate(int mode, String key) {
-        if (key == null || key != null && (key.length() % 8) != 0) {
-            throw new RuntimeException("Please input correct encrypting/decrypting key!\n" +
-                    "Key length is the times of 8!");
-        }
-
-        switch (mode) {
-            case Cipher.ENCRYPT_MODE:
-                this.mode = mode;
-                break;
-            case Cipher.DECRYPT_MODE:
-                this.mode = mode;
-                break;
-            default:
-                throw new RuntimeException("Unknown mode! only support [1: encryption, 2: decryption]");
-        }
-
-        // validate key and geberate the secret key
-        try {
-            skey_spec_ = new SecretKeySpec(key.toString().getBytes("UTF-8"), this.method);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+  @Override public String suppress(String input) {
+    String result = null;
+    switch (mode) {
+    case Cipher.ENCRYPT_MODE:
+      result = encrypt(input.getBytes());
+      break;
+    case Cipher.DECRYPT_MODE:
+      result = decrypt(Base64.getDecoder().decode(input.toString()));
+      break;
+    default:
+      throw new RuntimeException(
+          "Unknown mode! [1: encryption, 2: decryption]");
     }
-
-    @Override
-    public String suppress(String input) {
-        String result = null;
-        switch (mode) {
-            case Cipher.ENCRYPT_MODE:
-                result = encrypt(input.getBytes());
-                break;
-            case Cipher.DECRYPT_MODE:
-                result = decrypt(Base64.getDecoder().decode(input.toString()));
-                break;
-            default:
-                throw new RuntimeException("Unknown mode! [1: encryption, 2: decryption]");
-        }
-        return result;
-    }
+    return result;
+  }
 }

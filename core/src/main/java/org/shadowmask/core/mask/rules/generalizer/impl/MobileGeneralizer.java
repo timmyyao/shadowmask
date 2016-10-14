@@ -22,6 +22,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
+/**
+ * MobileGeneralizer support 4 mask levels, take "13811112222" for example:
+ * - LEVEL0, 13811112222
+ * - LEVEL1, 1381111****
+ * - LEVEL2, 138********
+ * - LEVEL3, *
+ */
 public class MobileGeneralizer implements Generalizer<String, String> {
   private static int ROOT_HIERARCHY_LEVEL = 3;
 

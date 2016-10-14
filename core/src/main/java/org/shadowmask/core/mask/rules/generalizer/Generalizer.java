@@ -18,9 +18,26 @@
 
 package org.shadowmask.core.mask.rules.generalizer;
 
+/**
+ * Generalization is the most common method to anonymize data. By masking part of the information
+ * in data, different data can be masked into same group, so that they can not be re-identified
+ * any more. Data can be masked on different levels based the information loss.
+ *
+ * @param <IN> input data type.
+ * @param <OUT> output data type.
+ */
 public interface Generalizer<IN, OUT> {
 
-    OUT generalize(IN input, int hierarchyLevel);
+  /**
+   * Generalize the input data at specified mask level.
+   * @param input the data to generalizing.
+   * @param hierarchyLevel the mask level of generalizing.
+   * @return generalized result.
+   */
+  OUT generalize(IN input, int hierarchyLevel);
 
-    int getRootLevel();
+  /**
+   * @return the max mask level this generalizer support.
+   */
+  int getRootLevel();
 }

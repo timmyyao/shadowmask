@@ -23,42 +23,42 @@ import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
 public class ShadeGeneralizer implements Generalizer<String, String> {
 
-    private int rootLevel;
-    private char shadeChar;
+  private int rootLevel;
+  private char shadeChar;
 
-    public ShadeGeneralizer(int rootHierarchyLevel) {
-        this(rootHierarchyLevel, '*');
+  public ShadeGeneralizer(int rootHierarchyLevel) {
+    this(rootHierarchyLevel, '*');
+  }
+
+  public ShadeGeneralizer(int rootHierarchyLevel, char shadeChar) {
+    this.rootLevel = rootHierarchyLevel;
+    this.shadeChar = shadeChar;
+  }
+
+  @Override public String generalize(String input, int hierarchyLevel) {
+    if (input == null) {
+      return null;
     }
 
-    public ShadeGeneralizer(int rootHierarchyLevel, char shadeChar) {
-        this.rootLevel = rootHierarchyLevel;
-        this.shadeChar = shadeChar;
+    if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
+      throw new MaskRuntimeException(
+          "Root hierarchy level of ShadeGeneralizer is " + rootLevel +
+              ", invalid input hierarchy level[" + hierarchyLevel + "]");
     }
 
-    @Override
-    public String generalize(String input, int hierarchyLevel) {
-        if (input == null) {
-            return null;
-        }
-
-        if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
-            throw new MaskRuntimeException("Root hierarchy level of ShadeGeneralizer is " + rootLevel +
-                    ", invalid input hierarchy level[" + hierarchyLevel + "]");
-        }
-
-        if (hierarchyLevel == 0) {
-            return input;
-        }
-
-        if (input.length() <= hierarchyLevel) {
-            return String.valueOf(shadeChar);
-        }
-
-        return input.substring(0, input.length() - hierarchyLevel) + StringUtils.repeat(shadeChar, hierarchyLevel);
+    if (hierarchyLevel == 0) {
+      return input;
     }
 
-    @Override
-    public int getRootLevel() {
-        return rootLevel;
+    if (input.length() <= hierarchyLevel) {
+      return String.valueOf(shadeChar);
     }
+
+    return input.substring(0, input.length() - hierarchyLevel) + StringUtils
+        .repeat(shadeChar, hierarchyLevel);
+  }
+
+  @Override public int getRootLevel() {
+    return rootLevel;
+  }
 }

@@ -22,44 +22,43 @@ import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
 public class LongGeneralizer implements Generalizer<Long, Long> {
 
-    private int rootLevel;
-    private int genUnit;
+  private int rootLevel;
+  private int genUnit;
 
-    public LongGeneralizer() {
-        this(String.valueOf(Long.MAX_VALUE).length());
+  public LongGeneralizer() {
+    this(String.valueOf(Long.MAX_VALUE).length());
+  }
+
+  public LongGeneralizer(int rootHierarchyLevel) {
+    this(rootHierarchyLevel, 10);
+  }
+
+  public LongGeneralizer(int rootHierarchyLevel, int genUnit) {
+    this.rootLevel = rootHierarchyLevel;
+    this.genUnit = genUnit;
+  }
+
+  @Override public Long generalize(Long input, int hierarchyLevel) {
+    if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
+      throw new MaskRuntimeException(
+          "Root hierarchy level of LongGeneralizer is " + rootLevel +
+              ", invalid input hierarchy level[" + hierarchyLevel + "]");
     }
 
-    public LongGeneralizer(int rootHierarchyLevel) {
-        this(rootHierarchyLevel, 10);
+    if (hierarchyLevel == 0) {
+      return input;
     }
 
-    public LongGeneralizer(int rootHierarchyLevel, int genUnit) {
-        this.rootLevel = rootHierarchyLevel;
-        this.genUnit = genUnit;
+    long genSplit = 1;
+
+    for (int i = 0; i < hierarchyLevel; i++) {
+      genSplit = genSplit * genUnit;
     }
 
-    @Override
-    public Long generalize(Long input, int hierarchyLevel) {
-        if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
-            throw new MaskRuntimeException("Root hierarchy level of LongGeneralizer is " + rootLevel +
-                    ", invalid input hierarchy level[" + hierarchyLevel + "]");
-        }
+    return input - input % genSplit;
+  }
 
-        if (hierarchyLevel == 0) {
-            return input;
-        }
-
-        long genSplit = 1;
-
-        for(int i=0; i<hierarchyLevel; i++) {
-            genSplit = genSplit * genUnit;
-        }
-
-        return input - input % genSplit;
-    }
-
-    @Override
-    public int getRootLevel() {
-        return rootLevel;
-    }
+  @Override public int getRootLevel() {
+    return rootLevel;
+  }
 }

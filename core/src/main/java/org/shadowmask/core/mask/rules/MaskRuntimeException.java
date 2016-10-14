@@ -18,19 +18,19 @@ package org.shadowmask.core.mask.rules;/*
 
 public class MaskRuntimeException extends RuntimeException {
 
-    public MaskRuntimeException() {
-        super();
-    }
+  public MaskRuntimeException() {
+    super();
+  }
 
-    public MaskRuntimeException(String message) {
-        super(message);
-    }
+  public MaskRuntimeException(String message) {
+    super(message);
+  }
 
-    public MaskRuntimeException(Exception e) {
-        super(e);
-    }
+  public MaskRuntimeException(Exception e) {
+    super(e);
+  }
 
-    public MaskRuntimeException(String message, Throwable e) {
-        super(message, e);
-    }
+  public MaskRuntimeException(String message, Throwable e) {
+    super(message, e);
+  }
 }
