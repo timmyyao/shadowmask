@@ -34,6 +34,9 @@ public class ByteGeneralizer implements Generalizer<Byte, Byte> {
     }
 
     public ByteGeneralizer(int rootHierarchyLevel, int genUnit) {
+        if(genUnit <= 0) {
+            throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
+        }
         this.rootLevel = rootHierarchyLevel;
         this.genUnit = genUnit;
     }
@@ -52,12 +55,10 @@ public class ByteGeneralizer implements Generalizer<Byte, Byte> {
         long genSplit = 1;
 
         for(int i=0; i<hierarchyLevel; i++) {
-            if(genSplit <= input || genSplit >= Long.MAX_VALUE/genUnit) {
-                genSplit = genSplit * genUnit;
-            }
-            else {
+            if(genSplit > input || genSplit >= Long.MAX_VALUE/genUnit) {
                 return 0;
             }
+            genSplit = genSplit * genUnit;
         }
 
         return (byte)(input - input % genSplit);

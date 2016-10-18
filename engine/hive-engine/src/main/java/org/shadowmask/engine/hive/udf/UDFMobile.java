@@ -32,8 +32,12 @@ import org.shadowmask.core.mask.rules.generalizer.impl.MobileGeneralizer;
 @Description(name = "mobile",
              value = "_FUNC_(mobile, mask) - returns the masked value of mobile\n"
                 + "mobile - original 11-digit mobile number combined with three parts \n"
-                + "mask - hide the district number or the mobile number: 1 masked, 0 unmasked",
-             extended = "Example:\n")
+                + "mask - 0~3 to indicate how many parts to be masked",
+             extended = "Example:\n"
+                + "mobile('13566668888', 0) = '13566668888'\n"
+                + "mobile('13566668888', 1) = '1356666****'\n"
+                + "mobile('13566668888', 2) = '135********'\n"
+                + "mobile('13566668888', 3) = '***********'\n")
 public class UDFMobile extends UDF {
 
   public Text evaluate(Text mobile, IntWritable mask) {

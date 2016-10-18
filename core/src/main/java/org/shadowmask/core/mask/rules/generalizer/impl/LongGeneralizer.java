@@ -34,6 +34,9 @@ public class LongGeneralizer implements Generalizer<Long, Long> {
     }
 
     public LongGeneralizer(int rootHierarchyLevel, int genUnit) {
+        if(genUnit <= 0) {
+            throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
+        }
         this.rootLevel = rootHierarchyLevel;
         this.genUnit = genUnit;
     }
@@ -52,6 +55,9 @@ public class LongGeneralizer implements Generalizer<Long, Long> {
         long genSplit = 1;
 
         for(int i=0; i<hierarchyLevel; i++) {
+            if(genSplit > input || genSplit >= Long.MAX_VALUE/genUnit) {
+                return 0L;
+            }
             genSplit = genSplit * genUnit;
         }
 

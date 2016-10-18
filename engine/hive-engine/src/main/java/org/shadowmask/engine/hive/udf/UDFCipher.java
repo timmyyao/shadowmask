@@ -20,6 +20,7 @@ package org.shadowmask.engine.hive.udf;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.shadowmask.core.mask.rules.suppressor.impl.AESSuppressor;
 
@@ -28,8 +29,9 @@ import org.shadowmask.core.mask.rules.suppressor.impl.AESSuppressor;
  *
  */
 @Description(name = "encrytion",
-        value = "_FUNC_(x,mode) - returns the encrypted data string of x\n"
-                + "mode - 1 : encryption, 2 : decryption",
+        value = "_FUNC_(x,mode,key) - returns the encrypted/decrypted data string of x\n"
+                + "mode - 1 : encryption, 2 : decryption\n"
+                + "key - the key string for encryption/decryption (it's length must be 16)",
         extended = "Example:\n")
 public class UDFCipher extends UDF {
     /**
@@ -37,11 +39,11 @@ public class UDFCipher extends UDF {
      *   1 encryption
      *   2 decryption
      */
-    public Text evaluate(Text content, int mode, Text key) {
+    public Text evaluate(Text content, IntWritable mode, Text key) {
         if (content == null) return null;
 
         AESSuppressor aes = new AESSuppressor();
-        aes.initiate(mode, key.toString());
+        aes.initiate(mode.get(), key.toString());
         String res = aes.suppress(content.toString());
         return new Text(res);
     }

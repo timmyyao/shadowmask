@@ -94,9 +94,9 @@ public class AESSuppressor implements Suppressor<String, String> {
     }
 
     public void initiate(int mode, String key) {
-        if (key == null || key != null && (key.length() % 8) != 0) {
+        if (key == null || key != null && key.length() != 16) {
             throw new MaskRuntimeException("Please input correct encrypting/decrypting key!\n" +
-                    "Key length is the times of 8!");
+                    "Key length must be 16!");
         }
 
         switch (mode) {

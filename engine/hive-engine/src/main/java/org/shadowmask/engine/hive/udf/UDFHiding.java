@@ -108,7 +108,7 @@ public class UDFHiding extends UDF{
     if(value == null) {
       return null;
     }
-    Text result = new Text();
+    Text result = new Text(value);
     return result;
   }
 }

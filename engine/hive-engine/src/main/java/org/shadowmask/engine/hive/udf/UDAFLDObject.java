@@ -23,10 +23,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class UDAFLDObject {
-  protected String row_key;
-  protected int count = 0;
-  private String sensitive_value;
-  private Map<String, Integer> deversities;
+  private String row_key; // the key of this category
+  private int count = 0; // the number of items in this category
+  private String sensitive_value; // the newly added sensitive value in this category
+  private Map<String, Integer> deversities; // the map of sensitive values
+  private int deversityNum = 0; // the number of deversities
+
+  public UDAFLDObject(String code) {
+    count = 0;
+    row_key = code;
+    sensitive_value = null;
+    deversities = new HashMap<String, Integer>();
+    deversityNum = 0;
+  }
 
   public UDAFLDObject(String code, String value) {
     count = 1;
@@ -34,6 +43,7 @@ public class UDAFLDObject {
     this.sensitive_value = value;
     this.deversities = new HashMap<String, Integer>();
     this.deversities.put(sensitive_value, 1);
+    this.deversityNum = 1;
   }
 
   @Override
@@ -56,28 +66,55 @@ public class UDAFLDObject {
     return true;
   }
 
+  // get the key of this category
   public String getRow() {
     return row_key;
   }
 
+  // get the number of items in this category
   public Integer getCount() {
     return deversities.size();
   }
 
+  // get the number of sensitive values in this category
+  public Integer getDeversityNumber() {
+    return deversityNum;
+  }
+
+  // get the newly added sensitive value
   public String getSensitiveValue() {
     return sensitive_value;
   }
 
+  // get the deversity map of this category
   public HashMap<String, Integer> getDeversities() {
     return (HashMap<String, Integer>) deversities;
   }
 
+  // set the number of items in this category
   public void setCount(Integer count) {
     this.count = count;
   }
 
+  // increase the number of items in this category by cnt
   public void increase(Integer cnt) {
     this.count += cnt;
+  }
+
+  // put a new sensitive value into this category with its occurrence number
+  public void put(String value, int valueNumber) {
+    this.sensitive_value = value;
+    if(!deversities.containsKey(sensitive_value)) {
+      deversities.put(sensitive_value, valueNumber);
+    }
+    else {
+      deversities.put(sensitive_value, deversities.get(sensitive_value) + valueNumber);
+    }
+    deversityNum = deversities.size();
+  }
+
+  public void put(String value) {
+    put(value,1);
   }
 
 }

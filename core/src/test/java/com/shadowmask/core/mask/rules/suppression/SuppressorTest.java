@@ -99,7 +99,7 @@ public class SuppressorTest {
     @Test(expected = MaskRuntimeException.class)
     public void AESSuppressionTestWithInvalidParameter1() {
         AESSuppressor suppression = new AESSuppressor();
-        suppression.initiate(3,"12345678");
+        suppression.initiate(3,"1234567812345678");
     }
 
     @Test(expected = MaskRuntimeException.class)

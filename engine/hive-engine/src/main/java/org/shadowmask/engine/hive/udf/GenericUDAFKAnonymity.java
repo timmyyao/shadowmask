@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -45,8 +46,12 @@ import org.apache.hadoop.io.Text;
 
 /**
  * GenericUDAFKAnonymity.
- * _FUNC_(val1, val2, ...) : Calculate the K-Anonymity of the columns of (val1, val2, ...)
  */
+@Description(name = "KAnonymity",
+        value = "_FUNC_( key1, key2, ...) : Calculate the K-Anonymity"
+                + "key: the masked QUSI_IDENTIFIER columns\n"
+                + "@return: a Statistic class containing minimal and mean K-Anonymity value",
+        extended = "Example:\n")
 public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
 
   @Override
@@ -105,7 +110,7 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
 
           mergeOI = (StandardMapObjectInspector) ObjectInspectorUtils.getStandardObjectInspector(internalMergeOI);
 
-          return ObjectInspectorFactory.getReflectionObjectInspector(UDAFObject.class,
+          return ObjectInspectorFactory.getReflectionObjectInspector(Statistics.class,
               ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         }
       }
@@ -154,6 +159,32 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
           }
         }
         return result == null ? null : result;
+      }
+
+      /**
+       * return the mean K-Anonymity value in map
+       */
+      double mean() {
+        double sum = 0;
+        if(freqMap.isEmpty()) {
+          return 0;
+        }
+        for(UDAFObject value : freqMap.values()) {
+          sum += value.getCount();
+        }
+        return sum/freqMap.size();
+      }
+
+      /**
+       * return the statistics of K-Anonymity value in map
+       */
+      Statistics calculateStatistics() {
+        UDAFObject minValue = this.min();
+        if(minValue == null) {
+          return null;
+        }
+        Statistics result = new Statistics(minValue.getCount(), this.mean());
+        return result;
       }
 
     }
@@ -209,14 +240,25 @@ public class GenericUDAFKAnonymity extends AbstractGenericUDAFResolver {
       }
     }
 
+    // The return class type to store the statistics of K-Anonymity
+    static class Statistics {
+      public int minKAnonymityValue = 0;
+      public double meanKAnonymityValue = 0;
+
+      public Statistics () {
+        minKAnonymityValue = 0;
+        meanKAnonymityValue = 0;
+      }
+
+      public Statistics (int minKAnonymityValue, double meanKAnonymityValue) {
+        this.minKAnonymityValue = minKAnonymityValue;
+        this.meanKAnonymityValue = meanKAnonymityValue;
+      }
+    }
+
     @Override
     public Object terminate(AggregationBuffer agg) throws HiveException {
-      UDAFObject minValue = ((FreqTable)agg).min();
-      if(minValue == null) {
-        return null;
-      } else {
-        return minValue;
-      }
+      return ((FreqTable)agg).calculateStatistics();
     }
 
   }

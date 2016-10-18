@@ -34,10 +34,14 @@ import org.shadowmask.core.mask.rules.generalizer.impl.ShortGeneralizer;
  * UDFAge.
  */
 @Description(name = "age",
-        value = "_FUNC_(age,mode,unit) - returns the generalization value for age\n"
-                + "mode - generalization method: 0 for floor, 1 for ceil\n"
+        value = "_FUNC_(age,level,unit) - returns the generalization value for age generalized by unit^level\n"
+                + "level - generalization level\n"
                 + "unit - generalization unit: must be a positive integer",
-        extended = "Example:\n")
+        extended = "Example:\n"
+                + "age(45,0,10) = 45;\n"
+                + "age(45,1,10) = 40;\n"
+                + "age(45,2,10) = 0;\n"
+                + "age(45,1,7) = 42;")
 public class UDFAge extends UDF{
   /**
    * Integer version

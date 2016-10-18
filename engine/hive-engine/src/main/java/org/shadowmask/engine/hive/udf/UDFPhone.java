@@ -32,15 +32,13 @@ import org.shadowmask.core.mask.rules.generalizer.impl.PhoneGeneralizer;
 @Description(name = "phone",
              value = "_FUNC_(phone, mask) - returns the masked value of phone\n"
                 + "phone - original phone number combined with a district number and a phone number like 001-66666666\n"
-                + "mask - hide the district number or the phone number: 1 masked, 0 unmasked",
-             extended = "Example:\n")
+                + "mask - 0~2 to indicate which parts to be masked",
+             extended = "Example:\n"
+                + "phone('001-66666666', 0) = '001-66666666\n"
+                + "phone('001-66666666', 1) = '001-********\n"
+                + "phone('001-66666666', 2) = '***-********'")
 public class UDFPhone extends UDF {
-  /* mask XXX-YYY:
-   * 0-(00)2  XXX-YYY
-   * 1-(01)2  XXX
-   * 2-(10)2  YYY
-   * 3-(11)2  
-   */
+
   public Text evaluate(Text phone, IntWritable mask) {
     if (phone == null || mask == null) return null;
     int mode = mask.get();

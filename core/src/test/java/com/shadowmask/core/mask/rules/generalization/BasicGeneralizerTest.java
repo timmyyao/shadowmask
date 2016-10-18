@@ -135,6 +135,27 @@ public class BasicGeneralizerTest {
         assertEquals(0, level5);
     }
 
+    @Test
+    public void longGeneralizationLargeValue() {
+        LongGeneralizer generalizer = new LongGeneralizer(Integer.MAX_VALUE, 10);
+        assertEquals(Integer.MAX_VALUE, generalizer.getRootLevel());
+        long input = 1234L;
+        long level0 = generalizer.generalize(input, 20);
+        assertEquals(0L, level0);
+        long level1 = generalizer.generalize(input, Integer.MAX_VALUE);
+        assertEquals(0L, level1);
+        generalizer = new LongGeneralizer(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        input = Long.MAX_VALUE - 35;
+        long level2 = generalizer.generalize(input, 0);
+        assertEquals(input, level2);
+        long level3 = generalizer.generalize(input, 1);
+        assertEquals(9223372034707292159L, level3);
+        long level4 = generalizer.generalize(input, 2);
+        assertEquals(9223372028264841218L, level4);
+        long level5 = generalizer.generalize(input, 3);
+        assertEquals(0L, level5);
+    }
+
     @Test(expected = MaskRuntimeException.class)
     public void intGeneralizationInvalidHierarchyLevel1() {
         IntGeneralizer generalization = new IntGeneralizer(5);
@@ -187,6 +208,27 @@ public class BasicGeneralizerTest {
         assertEquals(0, level5);
     }
 
+    @Test
+    public void intGeneralizationLargeValue() {
+        IntGeneralizer generalizer = new IntGeneralizer(Integer.MAX_VALUE, 10);
+        assertEquals(Integer.MAX_VALUE, generalizer.getRootLevel());
+        int input = 1234;
+        int level0 = generalizer.generalize(input, 20);
+        assertEquals(0L, level0);
+        int level1 = generalizer.generalize(input, Integer.MAX_VALUE);
+        assertEquals(0L, level1);
+        generalizer = new IntGeneralizer(Integer.MAX_VALUE, Integer.MAX_VALUE/2);
+        input = Integer.MAX_VALUE - 35;
+        int level2 = generalizer.generalize(input, 0);
+        assertEquals(input, level2);
+        int level3 = generalizer.generalize(input, 1);
+        assertEquals(1073741823, level3);
+        int level4 = generalizer.generalize(input, 2);
+        assertEquals(0, level4);
+        int level5 = generalizer.generalize(input, 3);
+        assertEquals(0, level5);
+    }
+
     @Test(expected = MaskRuntimeException.class)
     public void shortGeneralizationInvalidHierarchyLevel1() {
         ShortGeneralizer generalization = new ShortGeneralizer(5);
@@ -231,6 +273,23 @@ public class BasicGeneralizerTest {
         assertEquals(0, level3);
     }
 
+    @Test
+    public void shortGeneralizationLargeValue() {
+        ShortGeneralizer generalizer = new ShortGeneralizer(Integer.MAX_VALUE, 10);
+        assertEquals(Integer.MAX_VALUE, generalizer.getRootLevel());
+        short input = 1234;
+        short level0 = generalizer.generalize(input, 20);
+        assertEquals(0, level0);
+        short level1 = generalizer.generalize(input, Integer.MAX_VALUE);
+        assertEquals(0, level1);
+        generalizer = new ShortGeneralizer(Integer.MAX_VALUE, Integer.MAX_VALUE/2);
+        input = Short.MAX_VALUE - 4;
+        short level2 = generalizer.generalize(input, 0);
+        assertEquals(input, level2);
+        short level3 = generalizer.generalize(input, 1);
+        assertEquals(0, level3);
+    }
+
     @Test(expected = MaskRuntimeException.class)
     public void byteGeneralizationInvalidHierarchyLevel1() {
         ByteGeneralizer generalization = new ByteGeneralizer(3);
@@ -262,12 +321,6 @@ public class BasicGeneralizerTest {
         assertEquals(64, level4);
         byte level5 = generalization.generalize(input, 5);
         assertEquals(64, level5);
-        int max= Integer.MAX_VALUE;
-        int value=Integer.MAX_VALUE/2;
-        int x=value*4;
-        x=value*10;
-        x=value*1000;
-        x=value*value;
     }
 
     @Test
@@ -287,6 +340,23 @@ public class BasicGeneralizerTest {
         assertEquals(0, level4);
         byte level5 = generalization.generalize(input, 5);
         assertEquals(0, level5);
+    }
+
+    @Test
+    public void byteGeneralizationLargeValue() {
+        ByteGeneralizer generalizer = new ByteGeneralizer(Integer.MAX_VALUE, 10);
+        assertEquals(Integer.MAX_VALUE, generalizer.getRootLevel());
+        byte input = 12;
+        byte level0 = generalizer.generalize(input, 20);
+        assertEquals(0, level0);
+        byte level1 = generalizer.generalize(input, Integer.MAX_VALUE);
+        assertEquals(0, level1);
+        generalizer = new ByteGeneralizer(Integer.MAX_VALUE, Integer.MAX_VALUE/2);
+        input = Byte.MAX_VALUE - 4;
+        byte level2 = generalizer.generalize(input, 0);
+        assertEquals(input, level2);
+        byte level3 = generalizer.generalize(input, 1);
+        assertEquals(0, level3);
     }
 
     /*@Test
