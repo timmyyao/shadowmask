@@ -154,19 +154,6 @@
             <version>0.4.1</version>
         </dependency>
 
-
-        <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>2.6.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hive</groupId>
-            <artifactId>hive-jdbc</artifactId>
-            <version>1.1.0</version>
-        </dependency>
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
@@ -174,15 +161,12 @@
             <scope>compile</scope>
         </dependency>
 
-
         <!--akka-->
-
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_${akka.scala.version}</artifactId>
             <version>${akka.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
@@ -190,9 +174,5 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
-
-
 </project>
