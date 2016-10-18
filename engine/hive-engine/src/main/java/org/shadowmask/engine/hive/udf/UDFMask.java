@@ -30,11 +30,12 @@ import org.shadowmask.core.mask.rules.generalizer.impl.ShadeGeneralizer;
  * UDFMask.
  */
 @Description(name = "mask",
-        value = "_FUNC_(data,start,end,tag) - replace the sub-text of 'data' from start to end with 'tag'\n"
-                + "start - start position (sequence count from 1)\n"
-                + "end - end position (end >= start)\n"
-                + "tag - the signal to replace the sub-text which must be one single character",
-        extended = "Example:\n")
+        value = "_FUNC_(data,level,tag) - mask the last 'level' characters of 'data' with 'tag'\n"
+                + "level - mask level\n"
+                + "tag - the character to replace the sub-text",
+        extended = "Example:\n"
+                + "mask('hello world',2,'*') = 'hello wor**'\n"
+                + "mask('hello world',10,'-') = 'h----------'\n")
 public class UDFMask extends UDF{
   private final Text result = new Text();
 
@@ -44,7 +45,7 @@ public class UDFMask extends UDF{
       return null;
     }
 
-    Generalizer<String, String> generalizer = new ShadeGeneralizer(tag.toString().charAt(0));
+    Generalizer<String, String> generalizer = new ShadeGeneralizer(Integer.MAX_VALUE, tag.toString().charAt(0));
 
     result.set(generalizer.generalize(data.toString(), level.get()));
     return result;

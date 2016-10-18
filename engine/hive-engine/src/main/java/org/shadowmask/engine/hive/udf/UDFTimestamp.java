@@ -33,9 +33,17 @@ import java.sql.Timestamp;
  */
 @Description(name = "timestamp",
              value = "_FUNC_(timestamp, mask) - returns the masked value of timestamp\n"
-                + "timestamp - original timestamp type with date string and time string\n"
-                + "maskLevel - hide the date components or the time components, 1 masked, 0 unmasked",
-             extended = "Example:\n")
+                + "timestamp - original timestamp type\n"
+                + "mask - 0~7 to indicate which parts to be masked",
+             extended = "Example: time = \"2016-09-18T10:30:32.222\"\n"
+                + "timestamp(time, 0) = \"2016-09-18T10:30:32.222\"\n"
+                + "timestamp(time, 1) = \"2016-09-18T10:30:32.000\"\n"
+                + "timestamp(time, 2) = \"2016-09-18T10:30:00.000\"\n"
+                + "timestamp(time, 3) = \"2016-09-18T10:00:00.000\"\n"
+                + "timestamp(time, 4) = \"2016-09-18T00:00:00.000\"\n"
+                + "timestamp(time, 5) = \"2016-09-01T00:00:00.000\"\n"
+                + "timestamp(time, 6) = \"2016-01-01T00:00:00.000\"\n"
+                + "timestamp(time, 7) = \"0000-01-01T00:00:00.000\"\n")
 public class UDFTimestamp extends UDF {
 
   public TimestampWritable evaluate(TimestampWritable timestamp, IntWritable mask) {

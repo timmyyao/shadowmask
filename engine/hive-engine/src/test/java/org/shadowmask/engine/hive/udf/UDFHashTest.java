@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -15,30 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.shadowmask.engine.hive.udf;
 
-import org.apache.hadoop.hive.ql.exec.Description;
-import org.apache.hadoop.hive.ql.exec.UDF;
-import org.apache.hadoop.io.BinaryComparable;
-import org.apache.hadoop.io.ByteWritable;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
- * UDFHash.
- *
+ * Test for UDFHash.
  */
-@Description(name = "hash",
-             value = "_FUNC_(x) - returns a hash value instead of x",
-             extended = "Example:\n")
-public class UDFHash extends UDF {
-    public IntWritable evaluate(Object data) {
-        if (data == null) return null;
-        IntWritable hash = new IntWritable(data.hashCode());
-        return hash;
-    }
+public class UDFHashTest {
+  @Test
+  public void testUDFHash() {
+    UDFHash udfHash = new UDFHash();
+    Text data1 = new Text("hello");
+    IntWritable result = udfHash.evaluate(data1);
+    assertEquals(data1.hashCode(), result.get());
+    LongWritable data2 = new LongWritable(80000000000L);
+    result = udfHash.evaluate(data2);
+    assertEquals(data2.hashCode(), result.get());
+    IntWritable data3 = new IntWritable(345);
+    result = udfHash.evaluate(data3);
+    assertEquals(data3.hashCode(), result.get());
 
+    data3 = null;
+    result = udfHash.evaluate(data3);
+    assertNull(result);
+  }
 }

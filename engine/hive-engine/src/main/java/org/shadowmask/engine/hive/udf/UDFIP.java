@@ -32,8 +32,13 @@ import org.shadowmask.core.mask.rules.generalizer.impl.IPGeneralizer;
 @Description(name = "ip",
              value = "_FUNC_(ip, mask) - returns the masked value of ip\n"
                 + "ip - original ip like x.x.x.x\n"
-                + "mask - flags to imply hiding or displaying: 1 masked, 0 unmasked",
-             extended = "Example:\n")
+                + "mask - mask level (0~4)",
+             extended = "Example:\n"
+                + "ip('10.10.10.10', 0) = '10.10.10.10'"
+                + "ip('10.10.10.10', 1) = '10.10.10.*'"
+                + "ip('10.10.10.10', 2) = '10.10.*.*'"
+                + "ip('10.10.10.10', 3) = '10.*.*.*'"
+                + "ip('10.10.10.10', 4) = '*.*.*.*'")
 public class UDFIP extends UDF {
 
   public Text evaluate(Text ip, IntWritable mask) {

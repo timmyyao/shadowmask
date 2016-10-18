@@ -19,12 +19,10 @@
 package org.shadowmask.engine.hive.udf;
 
 import java.lang.StringBuilder;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.List;
-import java.util.ArrayList;
 
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -48,11 +46,16 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
-
 /**
  * GenericUDAFLDeversity.
- * _FUNC_(keyNum, key1, key2, ..., value1, value2, ...) : Calculate the L-Deversity
  */
+@Description(name = "LDeversity",
+        value = "_FUNC_(keyNum, key1, key2, ..., value1, value2, ...) : Calculate the L-Deversity\n"
+                + "keyNum: the number of keys (key1, key2, ...)\n"
+                + "key: the masked QUSI_IDENTIFIER columns\n"
+                + "value: the sensitive columns\n"
+                + "@return: a Statistic class containing minimal and mean L-Deversity value",
+        extended = "Example:\n")
 public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 
   @Override
@@ -120,7 +123,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
 
           mergeOI = (StandardMapObjectInspector) ObjectInspectorUtils.getStandardObjectInspector(internalMergeOI);
 
-          return ObjectInspectorFactory.getReflectionObjectInspector(UDAFLDObject.class,
+          return ObjectInspectorFactory.getReflectionObjectInspector(Statistics.class,
               ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         }
       }
@@ -139,7 +142,7 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
           key_str.append(values[i]);
         }
 
-        for (int i = key_columns_num + 1; i < values.length - 1; i++) {
+        for (int i = key_columns_num + 1; i < values.length; i++) {
           value_str.append(values[i]);
         }
 
@@ -157,13 +160,8 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
           sri.setCount(1);
           freqMap.put(sri.getRow(), sri);
         } else {
-          // increase deversities_ or not
-          HashMap d = v.getDeversities();
-          if (d.get(sri.getSensitiveValue()) == null) {
-            d.put(sri.getSensitiveValue(), 1);
-          } else {
-            d.putAll(sri.getDeversities());
-          }
+          v.put(sri.getSensitiveValue());
+          v.increase(1);
         }
       }
 
@@ -177,12 +175,38 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
         }
         UDAFLDObject result = null;
         for(UDAFLDObject value : freqMap.values()) {
-          if(value.getCount() < min) {
-            min = value.getCount();
+          if(value.getDeversityNumber() < min) {
+            min = value.getDeversityNumber();
             result = value;
           }
         }
         return result == null ? null : result;
+      }
+
+      /**
+       * return the mean L-Deversity value in map
+       */
+      double mean() {
+        double sum = 0;
+        if(freqMap.isEmpty()) {
+          return 0;
+        }
+        for(UDAFLDObject value : freqMap.values()) {
+          sum += value.getDeversityNumber();
+        }
+        return sum/freqMap.size();
+      }
+
+      /**
+       * return the statistics of L-Deversity value in map
+       */
+      Statistics calculateStatistics() {
+        UDAFLDObject minValue = this.min();
+        if(minValue == null) {
+          return null;
+        }
+        Statistics result = new Statistics(minValue.getDeversityNumber(), this.mean());
+        return result;
       }
 
     }
@@ -233,37 +257,40 @@ public class GenericUDAFLDeversity extends AbstractGenericUDAFResolver {
         LazyBinaryMap lbm = (LazyBinaryMap)((LazyBinaryStruct)e.getValue()).getField(3);
         Map m = lbm.getMap();
 
-        UDAFLDObject sri = new UDAFLDObject(row, value);
-        sri.setCount(count.get());
-
         // merge all the patial maps
-        UDAFLDObject v = ft.freqMap.get(sri.getRow());
+        UDAFLDObject v = ft.freqMap.get(row);
         if(v == null) {
-          sri.setCount(1);
-          ft.freqMap.put(sri.getRow(), sri);
-        } else {
-          // increase deversities_ or not
-          HashMap d = v.getDeversities();
-          if (d.get(sri.getSensitiveValue()) == null) {
-            // TODO: Currently, always set the count of sensitive columns
-            // as 1, because it's easy to get L value for a kind of class
-            // through the size the corresponding hash map.
-            d.put(sri.getSensitiveValue(), 1);
-          } else {
-            d.putAll(sri.getDeversities());
-          }
+          v = new UDAFLDObject(row);
+          ft.freqMap.put(row, v);
         }
+        for(Object entry : m.entrySet()) {
+          String val = ((Entry)entry).getKey().toString();
+          int valNumber = ((IntWritable)((Entry)entry).getValue()).get();
+          v.put(val, valNumber);
+        }
+        v.increase(count.get());
+      }
+    }
+
+    // The return class type to store the statistics of L-Deversity
+    static class Statistics {
+      public int minLDeversityValue = 0;
+      public double meanLDeversityValue = 0;
+
+      public Statistics () {
+        minLDeversityValue = 0;
+        meanLDeversityValue = 0;
+      }
+
+      public Statistics (int minLDeversityValue, double meanLDeversityValue) {
+        this.minLDeversityValue = minLDeversityValue;
+        this.meanLDeversityValue = meanLDeversityValue;
       }
     }
 
     @Override
     public Object terminate(AggregationBuffer agg) throws HiveException {
-      UDAFLDObject minValue = ((FreqTable)agg).min();
-      if(minValue == null) {
-        return null;
-      } else {
-        return minValue;
-      }
+      return ((FreqTable)agg).calculateStatistics();
     }
   }
 

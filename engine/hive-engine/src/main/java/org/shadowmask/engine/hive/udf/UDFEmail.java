@@ -31,9 +31,13 @@ import org.shadowmask.core.mask.rules.generalizer.impl.EmailGeneralizer;
  */
 @Description(name = "email",
              value = "_FUNC_(email, mask) - returns the masked value of email\n"
-                + "email - original email string combined with an account name and an email domain like xx@xx\n"
-                + "mask - hide the user name or the email domain: 1 masked, 0 unmasked",
-             extended = "Example:\n")
+                + "email - original email string combined with an account name and an email domain like xx@yy.zz\n"
+                + "mask - 4 kind of mask mode 0~3",
+             extended = "Example:\n"
+                + "email(xx@yy.zz,0) = xx@yy.zz\n"
+                + "email(xx@yy.zz,1) = *@yy.zz\n"
+                + "email(xx@yy.zz,2) = *@*.zz\n"
+                + "email(xx@yy.zz,3) = *@*.*\n")
 public class UDFEmail extends UDF {
   /* mask XXX@YYY:
    * 0-(00)2  XXX@YYY

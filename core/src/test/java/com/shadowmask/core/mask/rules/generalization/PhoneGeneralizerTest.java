@@ -22,6 +22,7 @@ import org.shadowmask.core.mask.rules.MaskRuntimeException;
 import org.shadowmask.core.mask.rules.generalizer.impl.PhoneGeneralizer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PhoneGeneralizerTest {
 
@@ -46,6 +47,7 @@ public class PhoneGeneralizerTest {
         generalization.generalize("hello", 2);
     }
 
+    @Test
     public void testPhoneGeneralization() {
         PhoneGeneralizer generalization = new PhoneGeneralizer();
         assertEquals(2, generalization.getRootLevel());
@@ -56,5 +58,8 @@ public class PhoneGeneralizerTest {
         assertEquals("021-********", generated1);
         String generated2 = generalization.generalize(mobile, 2);
         assertEquals("***-********", generated2);
+
+        String nullGenerated = generalization.generalize(null, 2);
+        assertNull(nullGenerated);
     }
 }

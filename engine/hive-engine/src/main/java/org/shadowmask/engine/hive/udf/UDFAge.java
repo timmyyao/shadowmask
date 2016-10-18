@@ -34,10 +34,14 @@ import org.shadowmask.core.mask.rules.generalizer.impl.ShortGeneralizer;
  * UDFAge.
  */
 @Description(name = "age",
-        value = "_FUNC_(age,mode,unit) - returns the generalization value for age\n"
-                + "mode - generalization method: 0 for floor, 1 for ceil\n"
+        value = "_FUNC_(age,level,unit) - returns the generalization value for age generalized by unit^level\n"
+                + "level - generalization level\n"
                 + "unit - generalization unit: must be a positive integer",
-        extended = "Example:\n")
+        extended = "Example:\n"
+                + "age(45,0,10) = 45;\n"
+                + "age(45,1,10) = 40;\n"
+                + "age(45,2,10) = 0;\n"
+                + "age(45,1,7) = 42;")
 public class UDFAge extends UDF{
   /**
    * Integer version
@@ -47,55 +51,55 @@ public class UDFAge extends UDF{
       return null;
     }
     int ageVal = age.get();
-    int modeVal = level.get();
+    int levelVal = level.get();
     int unitVal = unit.get();
-    Generalizer<Integer, Integer> generalizer = new IntGeneralizer(unitVal);
-    IntWritable result = new IntWritable(generalizer.generalize(ageVal, modeVal));
+    Generalizer<Integer, Integer> generalizer = new IntGeneralizer(Integer.MAX_VALUE, unitVal);
+    IntWritable result = new IntWritable(generalizer.generalize(ageVal, levelVal));
     return result;
   }
 
   /**
    * Byte version
    */
-  public ByteWritable evaluate(ByteWritable age, IntWritable mode, IntWritable unit) {
+  public ByteWritable evaluate(ByteWritable age, IntWritable level, IntWritable unit) {
     if (age == null) {
       return null;
     }
     byte ageVal = age.get();
-    int modeVal = mode.get();
+    int levelVal = level.get();
     int unitVal = unit.get();
-    Generalizer<Byte, Byte> generalizer = new ByteGeneralizer(unitVal);
-    ByteWritable result = new ByteWritable(generalizer.generalize(ageVal, modeVal));
+    Generalizer<Byte, Byte> generalizer = new ByteGeneralizer(Integer.MAX_VALUE, unitVal);
+    ByteWritable result = new ByteWritable(generalizer.generalize(ageVal, levelVal));
     return result;
   }
 
   /**
    * Long version
    */
-  public LongWritable evaluate(LongWritable age, IntWritable mode, IntWritable unit) {
+  public LongWritable evaluate(LongWritable age, IntWritable level, IntWritable unit) {
     if (age == null) {
       return null;
     }
     long ageVal = age.get();
-    int modeVal = mode.get();
+    int levelVal = level.get();
     int unitVal = unit.get();
-    Generalizer<Long, Long> generalizer = new LongGeneralizer(unitVal);
-    LongWritable result = new LongWritable(generalizer.generalize(ageVal, modeVal));
+    Generalizer<Long, Long> generalizer = new LongGeneralizer(Integer.MAX_VALUE, unitVal);
+    LongWritable result = new LongWritable(generalizer.generalize(ageVal, levelVal));
     return result;
   }
 
   /**
    * Short version
    */
-  public ShortWritable evaluate(ShortWritable age, IntWritable mode, IntWritable unit) {
+  public ShortWritable evaluate(ShortWritable age, IntWritable level, IntWritable unit) {
     if (age == null) {
       return null;
     }
     short ageVal = age.get();
-    int modeVal = mode.get();
+    int levelVal = level.get();
     int unitVal = unit.get();
-    Generalizer<Short, Short> generalizer = new ShortGeneralizer(unitVal);
-    ShortWritable result = new ShortWritable(generalizer.generalize(ageVal, modeVal));
+    Generalizer<Short, Short> generalizer = new ShortGeneralizer(Integer.MAX_VALUE, unitVal);
+    ShortWritable result = new ShortWritable(generalizer.generalize(ageVal, levelVal));
     return result;
   }
 }

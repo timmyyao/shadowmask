@@ -29,8 +29,9 @@ import org.shadowmask.core.mask.rules.suppressor.impl.UUIDSuppressor;
  * UDFUIdentifier.
  *
  */
-@Description(name = "unique indentifier",
-        value = "_FUNC_(x) - returns a unique identifier of x",
+@Description(name = "uIdentifier",
+        value = "_FUNC_(x) - returns a unique identifier of x using UUID\n"
+                + "_FUNC_(x, 'MD5') - returns a unique identifier of x using MD5",
         extended = "Example:\n")
 public class UDFUIdentifier extends UDF {
     /* Method-1: use UUID, the best efficiency*/
@@ -45,7 +46,7 @@ public class UDFUIdentifier extends UDF {
     }
 
     /* Method-2: use MD5/SHA/..*/
-    public Text evaluate(Text content, String encryptor) {
+    public Text evaluate(Text content, Text encryptor) {
         if (content == null) return null;
         String str = content.toString();
 

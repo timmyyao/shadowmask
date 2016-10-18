@@ -22,7 +22,11 @@ import org.shadowmask.core.mask.rules.suppressor.Suppressor;
 import java.util.UUID;
 
 public class UUIDSuppressor implements Suppressor<Object, String> {
-  @Override public String suppress(Object input) {
+  @Override
+  public String suppress(Object input) {
+    if (input == null) {
+      return null;
+    }
     byte[] bytes = input.toString().getBytes();
     UUID uuid = UUID.nameUUIDFromBytes(bytes);
     String res = uuid.toString().replaceAll("\\-", "");

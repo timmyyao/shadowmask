@@ -34,6 +34,9 @@ public class IntGeneralizer implements Generalizer<Integer, Integer> {
   }
 
   public IntGeneralizer(int rootHierarchyLevel, int genUnit) {
+    if(genUnit <= 0) {
+      throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
+    }
     this.rootLevel = rootHierarchyLevel;
     this.genUnit = genUnit;
   }
@@ -50,8 +53,10 @@ public class IntGeneralizer implements Generalizer<Integer, Integer> {
     }
 
     int genSplit = 1;
-
-    for (int i = 0; i < hierarchyLevel; i++) {
+    for(int i=0; i<hierarchyLevel; i++) {
+      if(genSplit > input || genSplit >= Integer.MAX_VALUE/genUnit) {
+        return 0;
+      }
       genSplit = genSplit * genUnit;
     }
 
