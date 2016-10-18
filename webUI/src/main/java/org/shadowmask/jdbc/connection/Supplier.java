@@ -1,5 +1,3 @@
-package org.shadowmask.jdbc.connection;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,7 +15,8 @@ package org.shadowmask.jdbc.connection;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.jdbc.connection;
 
 public interface Supplier<T> {
-    T get();
+  T get();
 }

@@ -1,5 +1,3 @@
-package org.shadowmask.model.datareader;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,13 +15,13 @@ package org.shadowmask.model.datareader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.datareader;
 
 import org.shadowmask.model.data.Schema;
-
 
 /**
  * schema filter .
  */
-public interface SchemaFilter extends Filter<Schema> {
+public interface SchemaFilter extends Function<Schema, Boolean> {
 
 }

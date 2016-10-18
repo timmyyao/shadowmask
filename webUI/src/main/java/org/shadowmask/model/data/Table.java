@@ -1,5 +1,3 @@
-package org.shadowmask.model.data;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,28 +15,28 @@ package org.shadowmask.model.data;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.data;
 
 public class Table {
 
-    private TitleCell[] titleCells;
-    private DataCell[][] dataCells;
+  private TitleCell[] titleCells;
+  private DataCell[][] dataCells;
 
-    public Table(int row, int cloumn) {
-        titleCells = new TitleCell[cloumn];
-        dataCells = new DataCell[row][cloumn];
-    }
+  public Table(int row, int cloumn) {
+    titleCells = new TitleCell[cloumn];
+    dataCells = new DataCell[row][cloumn];
+  }
 
-    public void setTitle(int c,TitleCell titleCell){
-        this.titleCells[c] = titleCell;
-    }
+  public void setTitle(int c, TitleCell titleCell) {
+    this.titleCells[c] = titleCell;
+  }
 
+  public DataCell get(int r, int c) {
+    return dataCells[r][c];
+  }
 
-    public DataCell get(int r, int c) {
-        return dataCells[r][c];
-    }
-
-    public void set(int r, int c, DataCell cell) {
-        dataCells[r][c] = cell;
-    }
+  public void set(int r, int c, DataCell cell) {
+    dataCells[r][c] = cell;
+  }
 
 }

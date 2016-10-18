@@ -33,6 +33,6 @@ class TestMd5 {
   def testMd5() = {
     val md5 = MessageDigest.getInstance("MD5")
     val str = new String(Hex.encodeHex(md5.digest("shadowmask".getBytes)))
-    assertTrue(str=="ad98bea499d76c4bccbaeb3e08e863d4")
+    assertTrue(str == "ad98bea499d76c4bccbaeb3e08e863d4")
   }
 }

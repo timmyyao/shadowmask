@@ -1,4 +1,3 @@
-package org.shadowmask.model.data;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,15 +15,16 @@ package org.shadowmask.model.data;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.data;
 
-public class TitleCell implements Cell{
-    public String columnName;
-    public TitleType type;
-    public String showName;
+public class TitleCell implements Cell {
+  public String columnName;
+  public TitleType type;
+  public String showName;
 
-    public TitleCell(String columnName, TitleType type, String showName) {
-        this.columnName = columnName;
-        this.type = type;
-        this.showName = showName;
-    }
+  public TitleCell(String columnName, TitleType type, String showName) {
+    this.columnName = columnName;
+    this.type = type;
+    this.showName = showName;
+  }
 }

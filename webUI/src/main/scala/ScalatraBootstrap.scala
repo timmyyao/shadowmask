@@ -28,10 +28,10 @@ class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) {
     implicit val system = ActorSystem("appActorSystem")
     try {
-      context mount (new AdminApi(), "/admin/*")
-      context mount (new DataApi(), "/data/*")
-      context mount (new WarehouseApi(), "/warehouse/*")
-      context mount (new ResourcesApp, "/api-docs/*")
+      context mount(new AdminApi(), "/admin/*")
+      context mount(new DataApi(), "/data/*")
+      context mount(new WarehouseApi(), "/warehouse/*")
+      context mount(new ResourcesApp, "/api-docs/*")
     } catch {
       case e: Throwable => e.printStackTrace()
     }

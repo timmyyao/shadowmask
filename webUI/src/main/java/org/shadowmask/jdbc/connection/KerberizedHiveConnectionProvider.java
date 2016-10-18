@@ -21,6 +21,7 @@ package org.shadowmask.jdbc.connection;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
 import org.shadowmask.utils.HiveProps;
 
 import java.io.IOException;
@@ -30,37 +31,60 @@ import java.sql.SQLException;
 
 public class KerberizedHiveConnectionProvider implements ConnectionProvider {
 
+  private boolean kdcLoginSuccessfully = true;
+  private static Logger logger =
+      Logger.getLogger(KerberizedHiveConnectionProvider.class);
 
-    private boolean kdcLoginSuccessfully = true;
-    private static Logger logger = Logger.getLogger(KerberizedHiveConnectionProvider.class);
+  {
+    System.setProperty("java.security.krb5.realm", HiveProps.krbRealm);
+    System.setProperty("java.security.krb5.kdc", HiveProps.krbKDC);
+    Configuration conf = new Configuration();
+    conf.setBoolean("hadoop.security.authorization", true);
+    conf.set("hadoop.security.authentication", "kerberos");
+    UserGroupInformation.setConfiguration(conf);
 
-    {
-        System.setProperty("java.security.krb5.realm", HiveProps.krbRealm);
-        System.setProperty("java.security.krb5.kdc", HiveProps.krbKDC);
-        Configuration conf = new Configuration();
-        conf.setBoolean( "hadoop.security.authorization" , true);
-        conf.set( "hadoop.security.authentication" , "kerberos");
-        UserGroupInformation. setConfiguration(conf);
-
-
-        try {
-            Class.forName(HiveProps.driver);
-            UserGroupInformation. loginUserFromKeytab(HiveProps.krbUser, HiveProps.krbKeytab );
-        } catch (Exception e) {
-            logger.warn("driver load failed",e);
-            kdcLoginSuccessfully = false;
-        }
-
+    try {
+      Class.forName(HiveProps.driver);
+      UserGroupInformation
+          .loginUserFromKeytab(HiveProps.krbUser, HiveProps.krbKeytab);
+    } catch (Exception e) {
+      logger.warn("driver load failed", e);
+      kdcLoginSuccessfully = false;
     }
-    @Override
-    public Connection get() {
-        if(!kdcLoginSuccessfully)
-            throw new RuntimeException("get connection failed,kdc login failed");
-        try {
-            return DriverManager.getConnection(HiveProps.url);
-        } catch (SQLException e) {
-            logger.warn("get jdbc connection failed",e);
-            throw new RuntimeException("get connection failed",e);
-        }
+
+  }
+
+  @Override public Connection get() {
+    if (!kdcLoginSuccessfully)
+      throw new RuntimeException("get connection failed,kdc login failed");
+    try {
+      return DriverManager.getConnection(HiveProps.url);
+    } catch (SQLException e) {
+      logger.warn("get jdbc connection failed", e);
+      throw new RuntimeException("get connection failed", e);
     }
+  }
+
+  @Override public Connection get(JDBCConnectionDesc desc) {
+    if (!kdcLoginSuccessfully)
+      throw new RuntimeException("get connection failed,kdc login failed");
+    try {
+      return DriverManager.getConnection(desc.toUrl());
+    } catch (SQLException e) {
+      logger.warn("get jdbc connection failed", e);
+      throw new RuntimeException("get connection failed", e);
+    }
+  }
+
+  // singleton
+  private KerberizedHiveConnectionProvider() {
+  }
+
+  private static KerberizedHiveConnectionProvider instance =
+      new KerberizedHiveConnectionProvider();
+
+  public static KerberizedHiveConnectionProvider getInstance() {
+    return instance;
+  }
+
 }

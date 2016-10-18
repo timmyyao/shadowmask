@@ -79,7 +79,7 @@
           {
             "name": "source",
             "in": "formData",
-            "description": "HIVE,SPARK, etc.",
+            "description": "HIVE,SPARK, etc. ; joined by \"#\"",
             "required": true,
             "type": "string"
           },
@@ -207,7 +207,7 @@
         }
       }
     },
-    "/data/cloumnTypes": {
+    "/data/columnTypes": {
       "get": {
         "summary": "get all cloumn types",
         "parameters": [
@@ -413,6 +413,9 @@
       "properties": {
         "token": {
           "type": "string"
+        },
+        "username": {
+          "type": "string"
         }
       }
     },
@@ -454,6 +457,20 @@
           "type": "string"
         },
         "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaObjectParent"
+          }
+        }
+      }
+    },
+    "SchemaObjectParent": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "schemas": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/SchemaObject"
@@ -535,6 +552,9 @@
         "cloumnType": {
           "type": "string",
           "description": "ID,HALF_ID,SENSITIVE,NONE_SENSITIVE,UNKNOWN"
+        },
+        "color": {
+          "type": "string"
         }
       }
     },
@@ -563,6 +583,9 @@
           "description": "ID,HALF_ID,SENSITIVE, NONE_SENSITIVE,UNKNOWN"
         },
         "colDesc": {
+          "type": "string"
+        },
+        "color": {
           "type": "string"
         }
       }
@@ -642,15 +665,23 @@
     "MaskRequest": {
       "type": "object",
       "properties": {
-        "dsType": {
+        "dsSource": {
           "type": "string",
           "description": "HIVE,SPARK,etc"
+        },
+        "dsType": {
+          "type": "string",
+          "description": "TABLE,VIEW etc"
         },
         "dsSchema": {
           "type": "string"
         },
         "dsTable": {
           "type": "string"
+        },
+        "distSource": {
+          "type": "string",
+          "description": "HIVE,SPARK,etc"
         },
         "distType": {
           "type": "string",

@@ -1,5 +1,3 @@
-package org.shadowmask.model.datareader;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,7 +15,8 @@ package org.shadowmask.model.datareader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.datareader;
 
-public interface Filter<T> {
-    Boolean filt(T t);
+public interface Function<T, R> {
+  R filt(T t);
 }

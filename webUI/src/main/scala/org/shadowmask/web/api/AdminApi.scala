@@ -42,18 +42,18 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
-  error{
-    case e:Exception=>
+  error {
+    case e: Exception =>
       e.printStackTrace()
   }
 
 
   val adminUsersGetOperation = (apiOperation[UserResult]("adminUsersGet")
     summary "get all users."
-    parameters(headerParam[String]("authToken").description(""))
+    parameters (headerParam[String]("Authorization").description("authentication token"))
     )
 
-  get("/users",operation(adminUsersGetOperation)) {
+  get("/users", operation(adminUsersGetOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -64,9 +64,9 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
       Some(0),
       Some("ok"),
       Some(List(
-        UserItem(Some("zhangsan"),Some("张三")),
-        UserItem(Some("xxx"),Some("hdfs")),
-        UserItem(Some("admin"),Some("超管"))
+        UserItem(Some("zhangsan"), Some("张三")),
+        UserItem(Some("xxx"), Some("hdfs")),
+        UserItem(Some("admin"), Some("超管"))
       ))
     )
   }
@@ -82,8 +82,8 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
     val password = params.getAs[String]("password")
     val (code, info, loginData) =
       getAuth().auth(Some(User(username.getOrElse(""), password.getOrElse("")))) match {
-        case Some(token) => (Some(0), Some("successfully"), Some(LoginResultData(Some(token.token))))
-        case _ => (Some(1), Some("failed"), Some(LoginResultData(Some(""))))
+        case Some(token) => (Some(0), Some("successfully"), Some(LoginResultData(Some(token.token), username)))
+        case _ => (Some(1), Some("failed"), Some(LoginResultData(Some(""), Some(""))))
       }
     LoginResult(code, info, loginData)
   }
@@ -91,7 +91,13 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   val adminGrantPostOperation = (apiOperation[SimpleResult]("adminGrantPost")
     summary "grant priviledges."
-    parameters(headerParam[String]("authToken").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""), formParam[String]("user").description(""))
+    parameters(
+    headerParam[String]("Authorization").description("authentication token"),
+    formParam[String]("source").description("database type, HIVE,SPARK, etc"),
+    formParam[String]("datasetType").description("data set type ,TABLE,VIEW, etc"),
+    formParam[String]("schema").description("the schema which the datasetType belongs to."),
+    formParam[String]("name").description("table/view name"),
+    formParam[String]("user").description("someone who the table will be granted to ."))
     )
 
   post("/grant", operation(adminGrantPostOperation)) {
@@ -125,13 +131,8 @@ class AdminApi(implicit val swagger: Swagger) extends ScalatraServlet
     val user = params.getAs[String]("user")
 
     println("user: " + user)
-    SimpleResult(Some(1),Some(""));
+    SimpleResult(Some(1), Some(""));
   }
-
-
-
-
-
 
 
 }

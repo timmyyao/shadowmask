@@ -1,5 +1,3 @@
-package org.shadowmask.model.datareader;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,6 +15,7 @@ package org.shadowmask.model.datareader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.datareader;
 
 import org.shadowmask.model.data.Schema;
 import org.shadowmask.model.data.Table;
@@ -26,34 +25,39 @@ import java.util.List;
 
 public interface IDataReader {
 
-    /**
-     * get all schemas
-     * @return
-     */
-    public List<Schema> getAllSchema();
+  /**
+   * get all schemas
+   *
+   * @return
+   */
+  public List<Schema> getAllSchema();
 
-    /**
-     * get schemas with filter
-     * @param filter
-     * @return
-     */
-    public List<Schema> getAllSchema(SchemaFilter filter);
+  /**
+   * get schemas with filter
+   *
+   * @param filter
+   * @return
+   */
+  public List<Schema> getAllSchema(SchemaFilter filter);
 
-    /**
-     * get table data
-     * @param tableProp
-     * @param fetchRows
-     * @return
-     */
-    public Table getTable(TableProp tableProp,int fetchRows);
+  /**
+   * get table data
+   *
+   * @param tableProp
+   * @param fetchRows
+   * @return
+   */
+  public Table getTable(TableProp tableProp, int fetchRows);
 
-    /**
-     * get table data with Title filter
-     * @param tableProp
-     * @param fetchRows
-     * @param filter
-     * @return
-     */
-    public Table getTable(TableProp tableProp,int fetchRows,TitleCellFilter filter);
+  /**
+   * get table data with Title filter
+   *
+   * @param tableProp
+   * @param fetchRows
+   * @param filter
+   * @return
+   */
+  public Table getTable(TableProp tableProp, int fetchRows,
+      TitleCellFilter filter);
 
 }

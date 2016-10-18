@@ -18,7 +18,11 @@
 
 package org.shadowmask.jdbc.connection;
 
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
+
 import java.sql.Connection;
 
 public interface ConnectionProvider extends Supplier<Connection> {
+
+  Connection get(JDBCConnectionDesc desc);
 }

@@ -73,37 +73,41 @@ class PlainUserAuth private extends UserAuth {
     * @return
     */
   override def verify(token: Option[Token]): Option[User] = {
-    if(JsonWebToken.validate(token.get.token,ConfiguredUsers().secret)){
+    if (JsonWebToken.validate(token.get.token, ConfiguredUsers().secret)) {
       token.getOrElse(Token("")).token match {
         case JsonWebToken(header, value, key) => {
           Option(User(value.asSimpleMap.get.get("username").getOrElse(""), ""))
         }
         case _ => None
       }
-    }else None
+    } else None
 
   }
 }
 
 object PlainUserAuth {
   val instance = new PlainUserAuth
-  def apply (): PlainUserAuth = instance
+
+  def apply(): PlainUserAuth = instance
 }
 
 
-class LdapServerAuth private extends UserAuth{
+class LdapServerAuth private extends UserAuth {
   override def auth(user: Option[User]): Option[Token] = ???
+
   override def verify(token: Option[Token]): Option[User] = ???
 }
 
-class MockLdapServerAuth private extends UserAuth{
+class MockLdapServerAuth private extends UserAuth {
   override def auth(user: Option[User]): Option[Token] = PlainUserAuth().auth(user)
+
   override def verify(token: Option[Token]): Option[User] = PlainUserAuth().verify(token)
 }
 
 object MockLdapServerAuth {
   val instance = new MockLdapServerAuth
-  def apply (): MockLdapServerAuth = instance
+
+  def apply(): MockLdapServerAuth = instance
 }
 
 /*----------------------------------------------------------------
@@ -111,26 +115,25 @@ object MockLdapServerAuth {
  ----------------------------------------------------------------*/
 
 
-
 /**
   * user auth provider
   */
-trait AuthProvider{
-  def getAuth:UserAuth
+trait AuthProvider {
+  def getAuth: UserAuth
 }
-trait PlainAuthProvider extends AuthProvider{
+
+trait PlainAuthProvider extends AuthProvider {
   def getAuth() = PlainUserAuth()
 }
-trait ConfiguredAuthProvider extends AuthProvider{
-  def getAuth() ={
+
+trait ConfiguredAuthProvider extends AuthProvider {
+  def getAuth() = {
     ShadowmaskProp().authType match {
       case "ldap" => MockLdapServerAuth()
-      case "plain"=>  PlainUserAuth()
+      case "plain" => PlainUserAuth()
     }
   }
 }
-
-
 
 
 /**
@@ -158,25 +161,31 @@ class ConfiguredUsers private {
 
 object ConfiguredUsers {
   val instance = new ConfiguredUsers
+
   def apply() = instance
 }
+
 ///////////ldap properties ////
-class LdapProp  private (val url:String)
-object LdapProp{
+class LdapProp private(val url: String)
+
+object LdapProp {
   val instance = new LdapProp({
     val resource = ResourceBundle.getBundle("ldap")
     resource.getString("user.auth.ldap.ldapserver")
   })
+
   def apply(): LdapProp = instance
 }
 
 /////////////shadow mask properties /////////////
-class ShadowmaskProp private (val authType:String)
-object ShadowmaskProp{
+class ShadowmaskProp private(val authType: String)
+
+object ShadowmaskProp {
   val instance = new ShadowmaskProp({
     val resource = ResourceBundle.getBundle("shadowmask")
     resource.getString("user.auth.method")
   })
+
   def apply(): ShadowmaskProp = instance
 }
 

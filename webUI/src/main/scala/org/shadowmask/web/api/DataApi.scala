@@ -42,16 +42,15 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
-  implicit def t2Some[T](t:T) = Some[T](t)
+  implicit def t2Some[T](t: T) = Some[T](t)
 
   val dataCloumnTypesGetOperation = (apiOperation[CloumnTypeResult]("dataCloumnTypesGet")
     summary "get all cloumn types"
-    parameters(headerParam[String]("authToken").description(""))
+    parameters (headerParam[String]("Authorization").description("authentication token"))
     )
 
 
-
-  get("/cloumnTypes",operation(dataCloumnTypesGetOperation)) {
+  get("/cloumnTypes", operation(dataCloumnTypesGetOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -61,22 +60,22 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
       Some(0),
       Some("ok"),
       Some(List(
-        CloumnType(Some("ID"),Some("唯一标识符")),
-        CloumnType(Some("HALF_ID"),Some("半标识符")),
-        CloumnType(Some("SENSITIVE"),Some("非敏感数据")),
-        CloumnType(Some("NONE_SENSITIVE"),Some("非敏感数据"))
+        CloumnType(Some("ID"), Some("唯一标识符"), "#FF0000"),
+        CloumnType(Some("HALF_ID"), Some("半标识符"), "#00FF00"),
+        CloumnType(Some("SENSITIVE"), Some("非敏感数据"), "#0000FF"),
+        CloumnType(Some("NONE_SENSITIVE"), Some("非敏感数据"), "#F0F0F0")
       ))
     )
   }
 
 
-
   val dataSchemaGetOperation = (apiOperation[SchemaResult]("dataSchemaGet")
-    summary "Adminstrator login api"
-    parameters(headerParam[String]("authToken").description(""), formParam[String]("source").description(""))
+    summary "get schemas of datasources ."
+    parameters(headerParam[String]("Authorization").description("authentication token"),
+    formParam[String]("source").description("database type, HIVE,SPARK, etc"))
     )
 
-  get("/schema",operation(dataSchemaGetOperation)) {
+  get("/schema", operation(dataSchemaGetOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -94,37 +93,61 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
       0,
       "ok",
       List(
-        SchemaObject(
-          "schema1",
-          "schemaName",
+        SchemaObjectParent(
+          "HIVE",
           List(
-            TableProp("table1","tabledesc")
+            SchemaObject(
+              "schema1",
+              "schemaName",
+              List(
+                TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc")
+              )
+            ),
+            SchemaObject(
+              "schema1",
+              "schemaName",
+              List(
+                TableProp("table1", "tabledesc")
+              )
+            ),
+            SchemaObject(
+              "schema1",
+              "schemaName",
+              List(
+                TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc")
+              )
+            )
           )
-        ),SchemaObject(
-          "schema2",
-          "schemaName",
+        ),
+        SchemaObjectParent(
+          "SPARK",
           List(
-            TableProp("table1","tabledesc"),TableProp("table2","tabledesc"),TableProp("table3","tabledesc")
-          )
-        ),SchemaObject(
-          "schema3",
-          "schemaName",
-          List(
-            TableProp("table1","tabledesc"),TableProp("table2","tabledesc")
+            SchemaObject(
+              "schema1",
+              "schemaName",
+              List(
+                TableProp("table1", "tabledesc")
+              )
+            )
           )
         )
+
       )
     )
   }
 
 
-
   val dataTableGetOperation = (apiOperation[TableResult]("dataTableGet")
     summary "get n-first record of a table"
-    parameters(headerParam[String]("authToken").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""), formParam[Int]("rows").description(""))
+    parameters(headerParam[String]("Authorization").description("authentication token"),
+    formParam[String]("source").description("database type, HIVE,SPARK, etc"),
+    formParam[String]("datasetType").description("data set type ,TABLE,VIEW"),
+    formParam[String]("schema").description("the schema which the datasetType belongs to."),
+    formParam[String]("name").description("table/view name"),
+    formParam[Int]("rows").description("number of rows"))
     )
 
-  get("/table",operation(dataTableGetOperation)) {
+  get("/table", operation(dataTableGetOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -161,14 +184,19 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
       0,
       "ok",
       TableContent(
-        List(TableTitle("id","ID","ID"),TableTitle("username","user's name ","HALF_ID"),TableTitle("url","some web site","SENSITIVE"),TableTitle("addr","address","NONE_SENSITIVE")),
         List(
-          List("1","tom","http://ww.a.com","qianmendajie"),
-          List("2","tom","http://ww.cca.com","renminguangchang"),
-          List("3","tom","http://ww.dda.com","东方明珠"),
-          List("6","tom","http://ww.aff.com","united states"),
-          List("4","tom","http://ww.add.com","japan"),
-          List("2","tom","http://ww.cca.com","earth")
+          TableTitle("id", "ID", "ID", "#0000FF"),
+          TableTitle("username", "user's name ", "HALF_ID", "#0000FF"),
+          TableTitle("url", "some web site", "SENSITIVE", "#0000FF"),
+          TableTitle("addr", "address", "NONE_SENSITIVE", "#0000FF")
+        ),
+        List(
+          List("1", "tom", "http://ww.a.com", "qianmendajie"),
+          List("2", "tom", "http://ww.cca.com", "renminguangchang"),
+          List("3", "tom", "http://ww.dda.com", "东方明珠"),
+          List("6", "tom", "http://ww.aff.com", "united states"),
+          List("4", "tom", "http://ww.add.com", "japan"),
+          List("2", "tom", "http://ww.cca.com", "earth")
         )
       )
     )

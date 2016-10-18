@@ -1,5 +1,3 @@
-package org.shadowmask.model.data;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,19 +15,20 @@ package org.shadowmask.model.data;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.data;
 
 public enum TitleType {
-    ID("ID","唯一标示符号"),
-    HALF_ID("HALF_ID","半标示符号"),
-    SENSITIVE("SENSITIVE","敏感数据"),
-    NONE_SENSITIVE("NONE_SENSITIVE","非敏感数据"),
-    UNKNOWN("UNKNOWN","未标记数据");
+  ID("ID", "唯一标示符号"),
+  HALF_ID("HALF_ID", "半标示符号"),
+  SENSITIVE("SENSITIVE", "敏感数据"),
+  NONE_SENSITIVE("NONE_SENSITIVE", "非敏感数据"),
+  UNKNOWN("UNKNOWN", "未标记数据");
 
-    public String name;
-    public String desc;
+  public String name;
+  public String desc;
 
-    TitleType(String name, String desc) {
-        this.name = name;
-        this.desc = desc;
-    }
+  TitleType(String name, String desc) {
+    this.name = name;
+    this.desc = desc;
+  }
 }

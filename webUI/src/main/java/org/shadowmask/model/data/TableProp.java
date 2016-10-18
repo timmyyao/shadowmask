@@ -1,5 +1,3 @@
-package org.shadowmask.model.data;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,8 +15,9 @@ package org.shadowmask.model.data;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.data;
 
 public class TableProp {
-    private String tabName;
-    private String tabShowName;
+  private String tabName;
+  private String tabShowName;
 }

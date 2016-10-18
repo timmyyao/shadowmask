@@ -39,7 +39,7 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
   protected val applicationDescription: String = "WarehouseApi"
   override protected val applicationName: Option[String] = Some("warehouse")
 
-  implicit def t2Some[T](t:T) = Some[T](t)
+  implicit def t2Some[T](t: T) = Some[T](t)
 
   before() {
     contentType = formats("json")
@@ -47,15 +47,17 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
 
-
-
   val warehouseDatasetDeleteOperation = (apiOperation[SimpleResult]("warehouseDatasetDelete")
     summary "delete an table"
-    parameters(headerParam[String]("authToken").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""))
+    parameters(headerParam[String]("Authorization").description("authentication token"),
+    formParam[String]("source").description("database type, HIVE,SPARK, etc"),
+    formParam[String]("datasetType").description("data set type ,TABLE,VIEW, etc"),
+    formParam[String]("schema").description("the schema which the datasetType belongs to"),
+    formParam[String]("name").description("table/view name"))
     )
 
   //some browses support get or post only .
-  post("/dataset/delete",operation(warehouseDatasetDeleteOperation)) {
+  post("/dataset/delete", operation(warehouseDatasetDeleteOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -81,17 +83,17 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
     val name = params.getAs[String]("name")
 
     println("name: " + name)
-    SimpleResult(0,"ok");
+    SimpleResult(0, "ok");
   }
-
 
 
   val warehouseMaskPostOperation = (apiOperation[SimpleResult]("warehouseMaskPost")
     summary "fetch all mask rules supported ."
-    parameters(headerParam[String]("authToken").description(""), bodyParam[MaskRequest]("maskRule").description(""))
+    parameters(headerParam[String]("Authorization").description("authentication token"),
+    bodyParam[MaskRequest]("maskRule").description("mask rules ."))
     )
 
-  post("/mask",operation(warehouseMaskPostOperation)) {
+  post("/mask", operation(warehouseMaskPostOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -102,17 +104,16 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
     val maskRule = parsedBody.extract[MaskRequest]
 
     println("maskRule: " + maskRule)
-    SimpleResult(0,"ok");
+    SimpleResult(0, "ok");
   }
-
 
 
   val warehouseMaskRulesGetOperation = (apiOperation[MaskRulesResult]("warehouseMaskRulesGet")
     summary "fetch all mask rules supported ."
-    parameters(headerParam[String]("authToken").description(""))
+    parameters (headerParam[String]("Authorization").description(""))
     )
 
-  get("/maskRules",operation(warehouseMaskRulesGetOperation)) {
+  get("/maskRules", operation(warehouseMaskRulesGetOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -133,18 +134,18 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
               "ruleName11",
               "rule1Desc11",
               List(
-                MaskRuleParam("param1","paraDesc","string"), MaskRuleParam("param2","paraDesc","string")
+                MaskRuleParam("param1", "paraDesc", "string"), MaskRuleParam("param2", "paraDesc", "string")
               )
-            ),MaskRule(
+            ), MaskRule(
               "rule12",
               "ruleName12",
               "rule1Desc12",
               List(
-                MaskRuleParam("cccc","paraDesc","string")
+                MaskRuleParam("cccc", "paraDesc", "string")
               )
             )
           )
-        ),MaskType(
+        ), MaskType(
           "2",
           "masksub",
           "ddxx",
@@ -154,21 +155,21 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
               "ruleName21",
               "rule1Desc21",
               List(
-                MaskRuleParam("dd","paraDesc","string"), MaskRuleParam("ffff","paraDesc","string")
+                MaskRuleParam("dd", "paraDesc", "string"), MaskRuleParam("ffff", "paraDesc", "string")
               )
-            ),MaskRule(
+            ), MaskRule(
               "rule22",
               "ruleName22",
               "rule1Desc22",
               List(
-                MaskRuleParam("param1","paraDesc","string")
+                MaskRuleParam("param1", "paraDesc", "string")
               )
-            ),MaskRule(
+            ), MaskRule(
               "rule23",
               "ruleName23",
               "rule1Desc23",
               List(
-                MaskRuleParam("ls","paraDesc","string"), MaskRuleParam("res","paraDesc","string"), MaskRuleParam("res1","paraDesc","string")
+                MaskRuleParam("ls", "paraDesc", "string"), MaskRuleParam("res", "paraDesc", "string"), MaskRuleParam("res1", "paraDesc", "string")
               )
             )
           )
@@ -178,13 +179,12 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
 
-
   val warehousePrivacyRiskGetOperation = (apiOperation[PriRiskResult]("warehousePrivacyRiskGet")
     summary "fetch all mask rules supported ."
-    parameters(headerParam[String]("authToken").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""))
+    parameters(headerParam[String]("Authorization").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""))
     )
 
-  get("/privacyRisk",operation(warehousePrivacyRiskGetOperation)) {
+  get("/privacyRisk", operation(warehousePrivacyRiskGetOperation)) {
 
 
     val authToken = request.getHeader("authToken")
@@ -215,7 +215,7 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
       0,
       "ok",
       List(
-        RiskItems("1","l","10"), RiskItems("2","K","10"), RiskItems("T","l","0.7")
+        RiskItems("1", "l", "10"), RiskItems("2", "K", "10"), RiskItems("T", "l", "0.7")
       )
     )
   }

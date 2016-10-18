@@ -1,5 +1,3 @@
-package org.shadowmask.model.datareader;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,10 +15,10 @@ package org.shadowmask.model.datareader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.model.datareader;
 
 import org.shadowmask.model.data.TitleCell;
 
-
-public interface TitleCellFilter extends Filter<TitleCell>  {
+public interface TitleCellFilter extends Function<TitleCell, Boolean> {
 
 }
