@@ -1,4 +1,4 @@
-package org.shadowmask.engine.spark.dsl
+package org.shadowmask.engine.spark.expressions
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.catalyst.expressions.MaskExpressions._

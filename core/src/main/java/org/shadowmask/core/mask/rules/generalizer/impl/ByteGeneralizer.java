@@ -22,50 +22,48 @@ import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
 public class ByteGeneralizer implements Generalizer<Byte, Byte> {
 
-    private int rootLevel;
-    private int genUnit;
+  private int rootLevel;
+  private int genUnit;
 
-    public ByteGeneralizer() {
-        this(String.valueOf(Long.MAX_VALUE).length());
+  public ByteGeneralizer() {
+    this(String.valueOf(Byte.MAX_VALUE).length());
+  }
+
+  public ByteGeneralizer(int rootHierarchyLevel) {
+    this(rootHierarchyLevel, 10);
+  }
+
+  public ByteGeneralizer(int rootHierarchyLevel, int genUnit) {
+    if(genUnit <= 0) {
+      throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
+    }
+    this.rootLevel = rootHierarchyLevel;
+    this.genUnit = genUnit;
+  }
+
+  @Override public Byte generalize(Byte input, int hierarchyLevel) {
+    if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
+      throw new MaskRuntimeException(
+          "Root hierarchy level of StringGeneralizer is " + rootLevel +
+              ", invalid input hierarchy level[" + hierarchyLevel + "]");
     }
 
-    public ByteGeneralizer(int rootHierarchyLevel) {
-        this(rootHierarchyLevel, 10);
+    if (hierarchyLevel == 0) {
+      return input;
     }
 
-    public ByteGeneralizer(int rootHierarchyLevel, int genUnit) {
-        if(genUnit <= 0) {
-            throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
-        }
-        this.rootLevel = rootHierarchyLevel;
-        this.genUnit = genUnit;
+    long genSplit = 1;
+    for(int i=0; i<hierarchyLevel; i++) {
+      if(genSplit > input || genSplit >= Long.MAX_VALUE/genUnit) {
+        return 0;
+      }
+      genSplit = genSplit * genUnit;
     }
 
-    @Override
-    public Byte generalize(Byte input, int hierarchyLevel) {
-        if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
-            throw new MaskRuntimeException("Root hierarchy level of StringGeneralizer is " + rootLevel +
-                    ", invalid input hierarchy level[" + hierarchyLevel + "]");
-        }
+    return (byte) (input - input % genSplit);
+  }
 
-        if (hierarchyLevel == 0) {
-            return input;
-        }
-
-        long genSplit = 1;
-
-        for(int i=0; i<hierarchyLevel; i++) {
-            if(genSplit > input || genSplit >= Long.MAX_VALUE/genUnit) {
-                return 0;
-            }
-            genSplit = genSplit * genUnit;
-        }
-
-        return (byte)(input - input % genSplit);
-    }
-
-    @Override
-    public int getRootLevel() {
-        return rootLevel;
-    }
+  @Override public int getRootLevel() {
+    return rootLevel;
+  }
 }

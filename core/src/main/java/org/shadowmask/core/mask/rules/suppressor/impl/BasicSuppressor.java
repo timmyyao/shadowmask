@@ -21,8 +21,7 @@ import org.shadowmask.core.mask.rules.suppressor.Suppressor;
 
 public class BasicSuppressor implements Suppressor<Object, String> {
 
-    @Override
-    public String suppress(Object input) {
-        return "*";
-    }
+  @Override public String suppress(Object input) {
+    return "*";
+  }
 }

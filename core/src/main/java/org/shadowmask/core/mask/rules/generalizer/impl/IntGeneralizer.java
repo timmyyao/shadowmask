@@ -22,50 +22,48 @@ import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
 public class IntGeneralizer implements Generalizer<Integer, Integer> {
 
-    private int rootLevel;
-    private int genUnit;
+  private int rootLevel;
+  private int genUnit;
 
-    public IntGeneralizer() {
-        this(String.valueOf(Integer.MAX_VALUE).length());
+  public IntGeneralizer() {
+    this(String.valueOf(Integer.MAX_VALUE).length());
+  }
+
+  public IntGeneralizer(int rootHierarchyLevel) {
+    this(rootHierarchyLevel, 10);
+  }
+
+  public IntGeneralizer(int rootHierarchyLevel, int genUnit) {
+    if(genUnit <= 0) {
+      throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
+    }
+    this.rootLevel = rootHierarchyLevel;
+    this.genUnit = genUnit;
+  }
+
+  @Override public Integer generalize(Integer input, int hierarchyLevel) {
+    if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
+      throw new MaskRuntimeException(
+          "Root hierarchy level of IntegerGeneralization is " + rootLevel +
+              ", invalid input hierarchy level[" + hierarchyLevel + "]");
     }
 
-    public IntGeneralizer(int rootHierarchyLevel) {
-        this(rootHierarchyLevel, 10);
+    if (hierarchyLevel == 0) {
+      return input;
     }
 
-    public IntGeneralizer(int rootHierarchyLevel, int genUnit) {
-        if(genUnit <= 0) {
-            throw new MaskRuntimeException("Unit must be a positive integer, invalid genUnit = " + genUnit);
-        }
-        this.rootLevel = rootHierarchyLevel;
-        this.genUnit = genUnit;
+    int genSplit = 1;
+    for(int i=0; i<hierarchyLevel; i++) {
+      if(genSplit > input || genSplit >= Integer.MAX_VALUE/genUnit) {
+        return 0;
+      }
+      genSplit = genSplit * genUnit;
     }
 
-    @Override
-    public Integer generalize(Integer input, int hierarchyLevel) {
-        if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
-            throw new MaskRuntimeException("Root hierarchy level of IntegerGeneralization is " + rootLevel +
-                    ", invalid input hierarchy level[" + hierarchyLevel + "]");
-        }
+    return input - input % genSplit;
+  }
 
-        if (hierarchyLevel == 0) {
-            return input;
-        }
-
-        int genSplit = 1;
-
-        for(int i=0; i<hierarchyLevel; i++) {
-            if(genSplit > input || genSplit >= Integer.MAX_VALUE/genUnit) {
-                return 0;
-            }
-            genSplit = genSplit * genUnit;
-        }
-
-        return input - input % genSplit;
-    }
-
-    @Override
-    public int getRootLevel() {
-        return rootLevel;
-    }
+  @Override public int getRootLevel() {
+    return rootLevel;
+  }
 }

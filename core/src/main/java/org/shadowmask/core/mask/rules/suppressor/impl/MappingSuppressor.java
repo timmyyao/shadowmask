@@ -26,31 +26,32 @@ import java.security.NoSuchAlgorithmException;
 
 /* Generate UID by method-2: use MD5/SHA/..*/
 public class MappingSuppressor implements Suppressor<Object, String> {
-    private String encryptor = "MD5";
+  private String encryptor = "MD5";
 
-    public MappingSuppressor(String encryptor) {
-        if (encryptor != null) this.encryptor = encryptor;
+  public MappingSuppressor(String encryptor) {
+    if (encryptor != null)
+      this.encryptor = encryptor;
+  }
+
+  @Override public String suppress(Object content) {
+    if (content == null) {
+      return null;
     }
+    try {
+      MessageDigest md = MessageDigest.getInstance(encryptor);
+      md.update(content.toString().getBytes());
+      byte[] eb = md.digest();
+      md.reset();
 
-    @Override
-    public String suppress(Object content) {
-        if (content == null) {
-            return null;
-        }
-        try {
-            MessageDigest md = MessageDigest.getInstance(encryptor);
-            md.update(content.toString().getBytes());
-            byte[] eb = md.digest();
-            md.reset();
+      StringBuilder sb = new StringBuilder();
+      for (byte b : eb) {
+        sb.append(Integer.toHexString(b & 0xff));
+      }
 
-            StringBuilder sb = new StringBuilder();
-            for (byte b : eb) {
-                sb.append(Integer.toHexString(b & 0xff));
-            }
-
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new MaskRuntimeException("Failed to encrypt input data with [" + encryptor + "].");
-        }
+      return sb.toString();
+    } catch (NoSuchAlgorithmException e) {
+      throw new MaskRuntimeException(
+          "Failed to encrypt input data with [" + encryptor + "].");
     }
+  }
 }

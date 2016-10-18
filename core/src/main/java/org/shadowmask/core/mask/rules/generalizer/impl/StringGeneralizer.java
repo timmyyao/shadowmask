@@ -22,37 +22,36 @@ import org.shadowmask.core.mask.rules.generalizer.Generalizer;
 
 public class StringGeneralizer implements Generalizer<String, String> {
 
-    private int rootLevel;
+  private int rootLevel;
 
-    public StringGeneralizer(int hierarchyLevel) {
-        this.rootLevel = hierarchyLevel;
+  public StringGeneralizer(int hierarchyLevel) {
+    this.rootLevel = hierarchyLevel;
+  }
+
+  @Override public String generalize(String input, int hierarchyLevel) {
+    if (input == null) {
+      return null;
     }
 
-    @Override
-    public String generalize(String input, int hierarchyLevel) {
-        if (input == null) {
-            return null;
-        }
-
-        if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
-            throw new MaskRuntimeException("Root hierarchy level of StringGeneralizer is " + rootLevel +
-                    ", invalid input hierarchy level[" + hierarchyLevel + "]");
-        }
-
-        if (hierarchyLevel == 0) {
-            return input;
-        }
-
-        if (input.length() <= hierarchyLevel) {
-            return "*";
-        }
-
-        return input.substring(0, input.length() - hierarchyLevel);
+    if (hierarchyLevel > rootLevel || hierarchyLevel < 0) {
+      throw new MaskRuntimeException(
+          "Root hierarchy level of StringGeneralizer is " + rootLevel +
+              ", invalid input hierarchy level[" + hierarchyLevel + "]");
     }
 
-    @Override
-    public int getRootLevel() {
-        return rootLevel;
+    if (hierarchyLevel == 0) {
+      return input;
     }
+
+    if (input.length() <= hierarchyLevel) {
+      return "*";
+    }
+
+    return input.substring(0, input.length() - hierarchyLevel);
+  }
+
+  @Override public int getRootLevel() {
+    return rootLevel;
+  }
 }
 

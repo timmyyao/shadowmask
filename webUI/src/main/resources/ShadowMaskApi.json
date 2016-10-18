@@ -42,9 +42,358 @@
           }
         }
       }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "get all users.",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/UserResult"
+            }
+          }
+        }
+      }
+    },
+    "/admin/grant": {
+      "post": {
+        "summary": "grant priviledges.",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "in": "formData",
+            "description": "HIVE,SPARK, etc. ; joined by \"#\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "datasetType",
+            "in": "formData",
+            "description": "VIEW,TABLE,etc",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "schema",
+            "in": "formData",
+            "description": "the schema witch the dataset belongs to",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of dataset",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/SimpleResult"
+            }
+          }
+        }
+      }
+    },
+    "/data/schema": {
+      "get": {
+        "summary": "Adminstrator login api",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "in": "formData",
+            "description": "hive,spark,etc",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return the schema data",
+            "schema": {
+              "$ref": "#/definitions/SchemaResult"
+            }
+          }
+        }
+      }
+    },
+    "/data/table": {
+      "get": {
+        "summary": "get n-first record of a table",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "in": "formData",
+            "description": "HIVE,SPARK, etc.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "datasetType",
+            "in": "formData",
+            "description": "VIEW,TABLE,etc",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "schema",
+            "in": "formData",
+            "description": "the schema witch the dataset belongs to",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of dataset",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "rows",
+            "in": "formData",
+            "description": "how many rows will get",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/TableResult"
+            }
+          }
+        }
+      }
+    },
+    "/data/columnTypes": {
+      "get": {
+        "summary": "get all cloumn types",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/CloumnTypeResult"
+            }
+          }
+        }
+      }
+    },
+    "/warehouse/dataset/delete": {
+      "post": {
+        "summary": "delete an table",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "in": "formData",
+            "description": "HIVE,SPARK, etc.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "datasetType",
+            "in": "formData",
+            "description": "VIEW,TABLE,etc",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "schema",
+            "in": "formData",
+            "description": "the schema witch the dataset belongs to",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of dataset",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/SimpleResult"
+            }
+          }
+        }
+      }
+    },
+    "/warehouse/maskRules": {
+      "get": {
+        "summary": "fetch all mask rules supported .",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/MaskRulesResult"
+            }
+          }
+        }
+      }
+    },
+    "/warehouse/mask": {
+      "post": {
+        "summary": "fetch all mask rules supported .",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "maskRule",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MaskRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/SimpleResult"
+            }
+          }
+        }
+      }
+    },
+    "/warehouse/privacyRisk": {
+      "get": {
+        "summary": "fetch all mask rules supported .",
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "source",
+            "in": "formData",
+            "description": "HIVE,SPARK, etc.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "datasetType",
+            "in": "formData",
+            "description": "VIEW,TABLE,etc",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "schema",
+            "in": "formData",
+            "description": "the schema witch the dataset belongs to",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of dataset",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/PriRiskResult"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "SimpleResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        }
+      }
+    },
     "LoginResult": {
       "type": "object",
       "properties": {
@@ -63,6 +412,355 @@
       "type": "object",
       "properties": {
         "token": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "UserResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserItem"
+          }
+        }
+      }
+    },
+    "UserItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        }
+      }
+    },
+    "SchemaResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaObjectParent"
+          }
+        }
+      }
+    },
+    "SchemaObjectParent": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "schemas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaObject"
+          }
+        }
+      }
+    },
+    "SchemaObject": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "showName": {
+          "type": "string"
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TableProp"
+          }
+        }
+      }
+    },
+    "TableProp": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "showName": {
+          "type": "string"
+        }
+      }
+    },
+    "TableResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/TableContent"
+        }
+      }
+    },
+    "TableContent": {
+      "type": "object",
+      "properties": {
+        "titles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TableTitle"
+          }
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "TableTitle": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "showName": {
+          "type": "string"
+        },
+        "cloumnType": {
+          "type": "string",
+          "description": "ID,HALF_ID,SENSITIVE,NONE_SENSITIVE,UNKNOWN"
+        },
+        "color": {
+          "type": "string"
+        }
+      }
+    },
+    "CloumnTypeResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CloumnType"
+          }
+        }
+      }
+    },
+    "CloumnType": {
+      "type": "object",
+      "properties": {
+        "colType": {
+          "type": "string",
+          "description": "ID,HALF_ID,SENSITIVE, NONE_SENSITIVE,UNKNOWN"
+        },
+        "colDesc": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        }
+      }
+    },
+    "MaskRulesResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MaskType"
+          }
+        }
+      }
+    },
+    "MaskType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MaskRule"
+          }
+        }
+      }
+    },
+    "MaskRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MaskRuleParam"
+          }
+        }
+      }
+    },
+    "MaskRuleParam": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        },
+        "dataType": {
+          "type": "string",
+          "description": "will be integer,string, boolean  etc"
+        }
+      }
+    },
+    "MaskRequest": {
+      "type": "object",
+      "properties": {
+        "dsSource": {
+          "type": "string",
+          "description": "HIVE,SPARK,etc"
+        },
+        "dsType": {
+          "type": "string",
+          "description": "TABLE,VIEW etc"
+        },
+        "dsSchema": {
+          "type": "string"
+        },
+        "dsTable": {
+          "type": "string"
+        },
+        "distSource": {
+          "type": "string",
+          "description": "HIVE,SPARK,etc"
+        },
+        "distType": {
+          "type": "string",
+          "description": "TABLE,VIEW etc"
+        },
+        "distSchema": {
+          "type": "string"
+        },
+        "distName": {
+          "type": "string"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ColRule"
+          }
+        }
+      }
+    },
+    "ColRule": {
+      "type": "object",
+      "properties": {
+        "colName": {
+          "type": "string"
+        },
+        "rule": {
+          "type": "object",
+          "properties": {
+            "maskTypeID": {
+              "type": "string"
+            },
+            "maskRuleID": {
+              "type": "string"
+            },
+            "maskParams": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "paramName": {
+                    "type": "string"
+                  },
+                  "paramValue": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "PriRiskResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RiskItems"
+          }
+        }
+      }
+    },
+    "RiskItems": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
           "type": "string"
         }
       }
