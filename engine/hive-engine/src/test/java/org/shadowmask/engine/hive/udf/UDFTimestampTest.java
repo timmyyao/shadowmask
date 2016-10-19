@@ -85,7 +85,7 @@ public class UDFTimestampTest {
     assertEquals(expect6, result.getTimestamp().getTime());
     mask.set(7);
     result = udfTimestamp.evaluate(timestamp, mask);
-    long expect7 = DateTime.parse("0000-01-01T00:00:00.000").getMillis();
+    long expect7 = DateTime.parse("1901-01-01T00:00:00.000").getMillis();
     assertEquals(expect7, result.getTimestamp().getTime());
 
     timestamp = null;
