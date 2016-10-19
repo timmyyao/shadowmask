@@ -66,7 +66,7 @@ public class TimeStampGeneralizerTest {
         long expected6 = DateTime.parse("2016-01-01T00:00:00.000").getMillis();
         assertEquals(expected6, generated6);
         long generated7 = generalization.generalize(timestamp, 7);
-        long expected7 = DateTime.parse("0000-01-01T00:00:00.000").getMillis();
+        long expected7 = DateTime.parse("1901-01-01T00:00:00.000").getMillis();
         assertEquals(expected7, generated7);
     }
 }

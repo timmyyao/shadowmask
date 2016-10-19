@@ -113,7 +113,7 @@ public class TimestampGeneralizer implements Generalizer<Long, Long> {
         dateTime = dateTime.hourOfDay().setCopy(0);
         dateTime = dateTime.dayOfMonth().setCopy(1);
         dateTime = dateTime.monthOfYear().setCopy(1);
-        dateTime = dateTime.year().setCopy(0);
+        dateTime = dateTime.year().setCopy(1901);
         break;
       }
 
