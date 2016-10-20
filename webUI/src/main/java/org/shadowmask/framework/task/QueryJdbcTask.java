@@ -27,7 +27,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public abstract class QueryJdbcTask<T extends Serializable> extends JDBCTask {
+public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureWatcher>
+    extends JDBCTask<W> {
   Logger logger = Logger.getLogger(this.getClass());
 
   @Override public void setUp() {
@@ -58,20 +59,11 @@ public abstract class QueryJdbcTask<T extends Serializable> extends JDBCTask {
    */
   public abstract List<T> queryResults();
 
-  /**
-   * watch the query  procedure .
-   *
-   * @return
-   */
-  public abstract ProcedureWatcher watcher();
-
   @Override public void invoke() {
     Connection connection = null;
     PreparedStatement stm = null;
     try {
-      if (watcher() != null) {
-        watcher().preStart();
-      }
+      triggerPreStart();
       connection = connectDB();
       stm = connection.prepareStatement(sql());
       ResultSet resultSet = stm.executeQuery();
@@ -80,13 +72,9 @@ public abstract class QueryJdbcTask<T extends Serializable> extends JDBCTask {
           collect(collector().collect(resultSet));
         }
       }
-      if (watcher() != null) {
-        watcher().onComplete();
-      }
-    } catch (SQLException e) {
-      if (watcher() != null) {
-        watcher().onException(e);
-      }
+      triggerComplete();
+    } catch (Throwable e) {
+      triggerException(e);
       logger.warn(
           String.format("Exception occurred when execute sql[ %s ]", sql()), e);
     } finally {

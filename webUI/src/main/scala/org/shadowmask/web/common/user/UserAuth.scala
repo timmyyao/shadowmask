@@ -21,7 +21,12 @@ package org.shadowmask.web.common.user
 import java.util.ResourceBundle
 
 import authentikat.jwt.{JsonWebToken, JwtClaimsSet, JwtHeader}
+import org.apache.directory.ldap.client.api.{LdapConnection, LdapNetworkConnection}
+import org.shadowmask.model.datareader.{Command, Consumer}
+import org.shadowmask.utils.NeverThrow
 import org.shadowmask.web.utils.MD5Hasher
+
+import scala.util.Try
 
 /**
   * abstract parent class
@@ -93,11 +98,37 @@ object PlainUserAuth {
 
 
 class LdapServerAuth private extends UserAuth {
-  override def auth(user: Option[User]): Option[Token] = ???
+  override def auth(user: Option[User]): Option[Token] = {
+    user match {
+      case None => None
+      case Some(user) =>
+        LdapToolKit.authUser(Some(user.username), Some(user.password)) match {
+          case Some(true) =>
+            Some(Token(JsonWebToken(JwtHeader("HS256"), JwtClaimsSet(Map("username" -> user.username)), user.password)))
+          case _ => None
+        }
+    }
+  }
 
-  override def verify(token: Option[Token]): Option[User] = ???
+  override def verify(token: Option[Token]): Option[User] = {
+    if (JsonWebToken.validate(token.get.token, ConfiguredUsers().secret)) {
+      token.getOrElse(Token("")).token match {
+        case JsonWebToken(header, value, key) => {
+          Option(User(value.asSimpleMap.get.get("username").getOrElse(""), ""))
+        }
+        case _ => None
+      }
+    } else None
+  }
 }
 
+object LdapServerAuth {
+  val instance = new LdapServerAuth
+
+  def apply(): LdapServerAuth = instance
+}
+
+//mocked ldap auth
 class MockLdapServerAuth private extends UserAuth {
   override def auth(user: Option[User]): Option[Token] = PlainUserAuth().auth(user)
 
@@ -129,7 +160,7 @@ trait PlainAuthProvider extends AuthProvider {
 trait ConfiguredAuthProvider extends AuthProvider {
   def getAuth() = {
     ShadowmaskProp().authType match {
-      case "ldap" => MockLdapServerAuth()
+      case "ldap" => LdapServerAuth()
       case "plain" => PlainUserAuth()
     }
   }
@@ -166,12 +197,32 @@ object ConfiguredUsers {
 }
 
 ///////////ldap properties ////
-class LdapProp private(val url: String)
+class LdapProp private(
+                        val host: String,
+                        val port: Int,
+                        val manager: String,
+                        val managerPwd: String,
+                        val rootDir: String,
+                        val userDomain: String,
+                        val usernameTemplete: String
+                      )
 
 object LdapProp {
+  val resource = ResourceBundle.getBundle("ldap")
   val instance = new LdapProp({
-    val resource = ResourceBundle.getBundle("ldap")
-    resource.getString("user.auth.ldap.ldapserver")
+    resource.getString("user.auth.ldap.host")
+  }, {
+    resource.getString("user.auth.ldap.port").toInt
+  }, {
+    resource.getString("user.auth.ldap.manager.dn")
+  }, {
+    resource.getString("user.auth.ldap.manager.password")
+  }, {
+    resource.getString("user.auth.ldap.rootdir")
+  }, {
+    resource.getString("user.auth.ldap.users.domain")
+  }, {
+    resource.getString("user.auth.ldap.users.nametemplete")
   })
 
   def apply(): LdapProp = instance
@@ -187,6 +238,38 @@ object ShadowmaskProp {
   })
 
   def apply(): ShadowmaskProp = instance
+}
+
+//ldap toolkit
+object LdapToolKit {
+  val ldapProp = LdapProp();
+
+  import ldapProp._
+
+  def authUser(name: Option[String], password: Option[String]): Option[Boolean] = {
+    assessLdap[Some[Boolean]]((conn) => {
+      conn.bind(usernameTemplete.replace("{username}", name.get) + "," + userDomain, password.get);
+      Some(true)
+    }, (conn, e) => {
+      Some(false)
+    })
+  }
+
+
+  def assessLdap[T](cmd: (LdapConnection) => T, except: (LdapConnection, Exception) => T) = {
+    var connection: LdapConnection = null;
+    try {
+      connection = new LdapNetworkConnection(LdapProp().host, LdapProp().port);
+      cmd(connection)
+    } catch {
+      case e: Exception => except(connection, e)
+    } finally {
+      if (null != connection) {
+        connection.close()
+      }
+    }
+
+  }
 }
 
 

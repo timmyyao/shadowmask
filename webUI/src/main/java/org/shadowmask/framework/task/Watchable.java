@@ -15,8 +15,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.shadowmask.model.datareader;
+package org.shadowmask.framework.task;
 
-public interface Function<T, R> {
-  R apply(T t);
+import java.util.List;
+
+/**
+ * @Description: class that can be watched by ProcedureWatcher.
+ */
+public interface Watchable<W extends ProcedureWatcher> {
+
+  /**
+   * register a Watcher
+   *
+   * @param watcher
+   */
+  void registerWatcher(W watcher);
+
+  /**
+   * unregister a Wather
+   *
+   * @param watcher
+   */
+  void unregisterWater(W watcher);
+
+  /**
+   * clear all watchers .
+   */
+  void clearAll();
+
+  /**
+   * get all registed watchers .
+   *
+   * @return
+   */
+  List<W> getAllWatchers();
+
 }

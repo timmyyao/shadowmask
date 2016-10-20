@@ -38,5 +38,5 @@ public interface ProcedureWatcher {
    *
    * @param e
    */
-  void onException(Exception e);
+  void onException(Throwable e);
 }

@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.shadowmask.model.datareader;
 
-public interface Function<T, R> {
-  R apply(T t);
+public interface Consumer<T> {
+  void consume(T t);
 }

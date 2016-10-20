@@ -20,20 +20,17 @@ package org.shadowmask.framework.task.hive;
 import org.shadowmask.framework.task.ExecutedJdbcTask;
 import org.shadowmask.framework.task.RollbackableProcedureWatcher;
 import org.shadowmask.jdbc.connection.ConnectionProvider;
-import org.shadowmask.jdbc.connection.WrappedConnectionProvider;
+import org.shadowmask.jdbc.connection.WrappedHiveConnectionProvider;
 
 import java.sql.Connection;
 
-public abstract class HiveExecutionTask extends ExecutedJdbcTask {
+public abstract class HiveExecutionTask
+    extends ExecutedJdbcTask<RollbackableProcedureWatcher> {
 
   ConnectionProvider connectionProvider;
 
   @Override public void setUp() {
-    connectionProvider = WrappedConnectionProvider.getInstance();
-  }
-
-  @Override public RollbackableProcedureWatcher watcher() {
-    return null;
+    connectionProvider = WrappedHiveConnectionProvider.getInstance();
   }
 
   @Override public Connection connectDB() {

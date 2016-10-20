@@ -19,13 +19,83 @@
 package org.shadowmask.framework.task;
 
 import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
+import org.shadowmask.model.datareader.Command;
+import org.shadowmask.utils.NeverThrow;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * jdbc task
  */
-public abstract class JDBCTask implements Task {
+public abstract class JDBCTask<W extends ProcedureWatcher> implements Task<W> {
+
+  private final List<W> watchers = new ArrayList<>();
+
+  @Override synchronized public void registerWatcher(W watcher) {
+    watchers.add(watcher);
+  }
+
+  @Override synchronized public void unregisterWater(W watcher) {
+    watchers.remove(watcher);
+  }
+
+  @Override synchronized public void clearAll() {
+    watchers.clear();
+  }
+
+  @Override public List<W> getAllWatchers() {
+    return watchers;
+  }
+
+  /**
+   * trigger preStart
+   */
+  void triggerPreStart() {
+    if (getAllWatchers() != null) {
+      for (final W w : getAllWatchers()) {
+        NeverThrow.exe(new Command() {
+          @Override public void exe() {
+            w.preStart();
+          }
+        }, new NeverThrow.LoggerConsumer(), null);
+      }
+    }
+  }
+
+  /**
+   * trigger Complete
+   */
+  void triggerComplete() {
+    if (getAllWatchers() != null) {
+      for (final W w : getAllWatchers()) {
+        NeverThrow.exe(new Command() {
+          @Override public void exe() {
+            w.onComplete();
+          }
+        }, new NeverThrow.LoggerConsumer(), null);
+      }
+    }
+  }
+
+  /**
+   * trigger Exception
+   *
+   * @param throwable
+   */
+  void triggerException(final Throwable throwable) {
+    if (getAllWatchers() != null) {
+      for (final W w : getAllWatchers()) {
+        NeverThrow.exe(new Command() {
+          @Override public void exe() {
+            w.onException(throwable);
+          }
+        }, new NeverThrow.LoggerConsumer(), null);
+      }
+    }
+  }
+
   /**
    * get Connection of backend database, must executed lazily because of Connection object cannot be serialized
    *

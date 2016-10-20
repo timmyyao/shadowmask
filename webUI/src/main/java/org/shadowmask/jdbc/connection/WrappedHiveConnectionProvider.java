@@ -16,22 +16,35 @@
  * limitations under the License.
  */
 
-package org.shadowmask.framework.task;
+package org.shadowmask.jdbc.connection;
 
-import java.io.Serializable;
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
+
+import java.sql.Connection;
 
 /**
- * parent of all types of tasks .
+ * get Connection due to config,
+ * should support both kerberized and ldap according to configuration .
  */
-public interface Task<W extends ProcedureWatcher> extends Watchable<W> {
+public class WrappedHiveConnectionProvider implements ConnectionProvider {
 
-  /**
-   * set up something like jdbc Connection  before execution .
-   */
-  void setUp();
+  @Override public Connection get() {
+    return KerberizedHiveConnectionProvider.getInstance().get();
+  }
 
-  /**
-   * main logic
-   */
-  void invoke();
+  @Override public Connection get(JDBCConnectionDesc desc) {
+    return KerberizedHiveConnectionProvider.getInstance().get(desc);
+  }
+
+  // singleton
+  private WrappedHiveConnectionProvider() {
+  }
+
+  private static WrappedHiveConnectionProvider instance =
+      new WrappedHiveConnectionProvider();
+
+  public static WrappedHiveConnectionProvider getInstance() {
+    return instance;
+  }
+
 }

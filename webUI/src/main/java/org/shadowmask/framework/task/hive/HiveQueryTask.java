@@ -18,7 +18,7 @@
 package org.shadowmask.framework.task.hive;
 
 import org.shadowmask.jdbc.connection.ConnectionProvider;
-import org.shadowmask.jdbc.connection.WrappedConnectionProvider;
+import org.shadowmask.jdbc.connection.WrappedHiveConnectionProvider;
 import org.shadowmask.framework.task.ProcedureWatcher;
 import org.shadowmask.framework.task.QueryJdbcTask;
 
@@ -28,21 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class HiveQueryTask<T extends Serializable>
-    extends QueryJdbcTask<T> {
+    extends QueryJdbcTask<T, ProcedureWatcher> {
 
   List<T> res = null;
-
-  // must be assigned at slave-end
-
-  ProcedureWatcher watcher;
 
   ConnectionProvider connectionProvider;
 
   @Override public void setUp() {
     super.setUp();
-    watcher = new Watcher();
     res = new ArrayList<>();
-    connectionProvider = WrappedConnectionProvider.getInstance();
+    connectionProvider = WrappedHiveConnectionProvider.getInstance();
   }
 
   @Override public void collect(T t) {
@@ -53,30 +48,11 @@ public abstract class HiveQueryTask<T extends Serializable>
     return res;
   }
 
-  @Override public ProcedureWatcher watcher() {
-    return watcher;
-  }
-
   @Override public Connection connectDB() {
     if (connectionDesc() != null)
       return connectionProvider.get(connectionDesc());
     else
       return connectionProvider.get();
-  }
-
-  class Watcher implements ProcedureWatcher {
-
-    @Override public void preStart() {
-      // do nothing
-    }
-
-    @Override public void onComplete() {
-      // do nothing
-    }
-
-    @Override public void onException(Exception e) {
-      //do nothing
-    }
   }
 
 }

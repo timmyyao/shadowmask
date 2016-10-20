@@ -15,8 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.shadowmask.model.datareader;
 
-public interface Function<T, R> {
-  R apply(T t);
+package org.shadowmask.framework.executor;
+
+import org.shadowmask.framework.task.Task;
+
+/**
+ * aim at executing an Task object
+ */
+public abstract class TaskExecutor {
+
+  /**
+   * execute a Synced task
+   *
+   * @param task
+   */
+  public void executeTaskSync(Task task) {
+    task.setUp();
+    task.invoke();
+  }
+
+  /**
+   * execute a Async task
+   *
+   * @param task
+   */
+  public abstract void executeTaskAsync(Task task);
 }

@@ -15,8 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.shadowmask.model.datareader;
+package org.shadowmask.test;
 
-public interface Function<T, R> {
-  R apply(T t);
+import org.junit.Test;
+import org.shadowmask.model.datareader.Command;
+import org.shadowmask.model.datareader.Consumer;
+import org.shadowmask.model.datareader.Function;
+import org.shadowmask.utils.NeverThrow;
+
+public class TestNeverThrow {
+
+
+  @Test
+  public void testNeverThrow(){
+    NeverThrow.exe(new Command() {
+      @Override public void exe() {
+        throw new RuntimeException();
+      }
+    }, new Consumer<Throwable>() {
+      @Override public void consume(Throwable throwable) {
+        throw new RuntimeException(throwable);
+      }
+    }, new Command() {
+      @Override public void exe() {
+        throw new RuntimeException();
+      }
+    });
+  }
 }

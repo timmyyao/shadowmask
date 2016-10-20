@@ -37,5 +37,5 @@ public interface RollbackableProcedureWatcher extends ProcedureWatcher {
    *
    * @param e
    */
-  void onRollBackException(Exception e);
+  void onRollBackException(Throwable e);
 }

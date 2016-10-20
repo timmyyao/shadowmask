@@ -167,6 +167,13 @@
             <artifactId>akka-actor_${akka.scala.version}</artifactId>
             <version>${akka.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.directory.api/api-all -->
+        <dependency>
+            <groupId>org.apache.directory.api</groupId>
+            <artifactId>api-all</artifactId>
+            <version>1.0.0-RC1</version>
+        </dependency>
+
 
         <dependency>
             <groupId>junit</groupId>
