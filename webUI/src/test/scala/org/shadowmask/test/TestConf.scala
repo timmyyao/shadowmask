@@ -29,8 +29,7 @@ class TestConf {
 
   @Test
   def testLdapConf(): Unit = {
-    assertNotNull(LdapProp().url)
-    println(LdapProp().url)
+    assertNotNull(LdapProp().host)
   }
 
   @Test
@@ -39,4 +38,9 @@ class TestConf {
     println(ShadowmaskProp().authType)
   }
 
+  @Test
+  def testUserNameTemplete(): Unit = {
+    val username = LdapProp().usernameTemplete.replace("{username}","ldap")
+    assertEquals(username,"uid=ldap")
+  }
 }

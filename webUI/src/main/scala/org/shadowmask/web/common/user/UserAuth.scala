@@ -21,6 +21,9 @@ package org.shadowmask.web.common.user
 import java.util.ResourceBundle
 
 import authentikat.jwt.{JsonWebToken, JwtClaimsSet, JwtHeader}
+import org.apache.directory.api.ldap.model.cursor.EntryCursor
+import org.apache.directory.api.ldap.model.entry.Entry
+import org.apache.directory.api.ldap.model.message.SearchScope
 import org.apache.directory.ldap.client.api.{LdapConnection, LdapNetworkConnection}
 import org.shadowmask.model.datareader.{Command, Consumer}
 import org.shadowmask.utils.NeverThrow
@@ -240,14 +243,30 @@ object ShadowmaskProp {
   def apply(): ShadowmaskProp = instance
 }
 
+class LdapUser(
+                val dn:String,
+                val uid:String
+              ){
+  def this(entry: Entry) = this(entry.getDn.getName,entry.get("uid").getString)
+}
+
+
 //ldap toolkit
 object LdapToolKit {
   val ldapProp = LdapProp();
 
   import ldapProp._
 
+
+  /**
+    * user authorization by ldap server .
+    *
+    * @param name     usename
+    * @param password password of user .
+    * @return
+    */
   def authUser(name: Option[String], password: Option[String]): Option[Boolean] = {
-    assessLdap[Some[Boolean]]((conn) => {
+    accessLdap[Some[Boolean]]((conn) => {
       conn.bind(usernameTemplete.replace("{username}", name.get) + "," + userDomain, password.get);
       Some(true)
     }, (conn, e) => {
@@ -255,8 +274,31 @@ object LdapToolKit {
     })
   }
 
+  def fetchLdapUserList():Option[List[LdapUser]] = {
+    Some(
+      accessLdap[List[LdapUser]](conn=>{
+        conn.bind(manager,managerPwd)
+        val cursor = conn.search(userDomain,"(objectclass=*)",SearchScope.SUBTREE)
+        val list = Nil
+        while (cursor.next()){
+          new LdapUser(cursor.get()) :: list
+        }
+        list
+      },(conn,e)=>{
+        Nil
+      })
+    )
+  }
 
-  def assessLdap[T](cmd: (LdapConnection) => T, except: (LdapConnection, Exception) => T) = {
+  /**
+    * access ldap server
+    *
+    * @param cmd    code run normally
+    * @param except code will after exception occured .
+    * @tparam T result type
+    * @return
+    */
+  def accessLdap[T](cmd: (LdapConnection) => T, except: (LdapConnection, Exception) => T) = {
     var connection: LdapConnection = null;
     try {
       connection = new LdapNetworkConnection(LdapProp().host, LdapProp().port);
