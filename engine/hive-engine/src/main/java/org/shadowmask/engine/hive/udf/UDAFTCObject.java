@@ -18,30 +18,29 @@
 
 package org.shadowmask.engine.hive.udf;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.TreeMap;
 
-public class UDAFLDObject {
+public class UDAFTCObject {
   private String row_key; // the key of this category
   private int count = 0; // the number of items in this category
   private String sensitive_value; // the newly added sensitive value in this category
   private Map<String, Integer> deversities; // the map of sensitive values
   private int deversityNum = 0; // the number of deversities
 
-  public UDAFLDObject(String code) {
+  public UDAFTCObject(String code) {
     count = 0;
     row_key = code;
     sensitive_value = null;
-    deversities = new HashMap<String, Integer>();
+    deversities = new TreeMap<String, Integer>();
     deversityNum = 0;
   }
 
-  public UDAFLDObject(String code, String value) {
+  public UDAFTCObject(String code, String value) {
     count = 1;
     row_key = code;
     this.sensitive_value = value;
-    this.deversities = new HashMap<String, Integer>();
+    this.deversities = new TreeMap<String, Integer>();
     this.deversities.put(sensitive_value, 1);
     this.deversityNum = 1;
   }
@@ -59,9 +58,9 @@ public class UDAFLDObject {
       return true;
     }
     if(obj == null || getClass() != obj.getClass()) {
-        return false;
+      return false;
     }
-    UDAFLDObject row = (UDAFLDObject) obj;
+    UDAFTCObject row = (UDAFTCObject) obj;
     if(!row_key.equals(row.row_key)) return false;
     return true;
   }
@@ -87,8 +86,8 @@ public class UDAFLDObject {
   }
 
   // get the deversity map of this category
-  public HashMap<String, Integer> getDeversities() {
-    return (HashMap<String, Integer>) deversities;
+  public TreeMap<String, Integer> getDeversities() {
+    return (TreeMap<String, Integer>) deversities;
   }
 
   // set the number of items in this category
