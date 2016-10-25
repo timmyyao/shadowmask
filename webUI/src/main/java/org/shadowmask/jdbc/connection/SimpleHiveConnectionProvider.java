@@ -18,42 +18,48 @@
 
 package org.shadowmask.jdbc.connection;
 
+import org.apache.log4j.Logger;
 import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
-import org.shadowmask.jdbc.connection.description.KerberizedHive2JdbcConnDesc;
 import org.shadowmask.jdbc.connection.description.SimpleHive2JdbcConnDesc;
+import org.shadowmask.utils.HiveProps;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-/**
- * get Connection due to config
- */
-public class WrappedConnectionProvider implements ConnectionProvider {
+public class SimpleHiveConnectionProvider<DESC extends SimpleHive2JdbcConnDesc> implements ConnectionProvider<DESC> {
+
+  private static Logger logger =
+      Logger.getLogger(SimpleHiveConnectionProvider.class);
+
+
 
   @Override public Connection get() {
-    return KerberizedHiveConnectionProvider.getInstance().get();
+    try {
+      return DriverManager.getConnection(HiveProps.url,HiveProps.user,HiveProps.password);
+    } catch (SQLException e) {
+      logger.warn("get jdbc connection failed", e);
+      throw new RuntimeException("get connection failed", e);
+    }
   }
 
-  @Override public Connection get(JDBCConnectionDesc desc) {
-    if (desc instanceof KerberizedHive2JdbcConnDesc) {
-      return KerberizedHiveConnectionProvider.getInstance()
-          .get((KerberizedHive2JdbcConnDesc) desc);
-    } else if (desc instanceof SimpleHive2JdbcConnDesc) {
-      return SimpleHiveConnectionProvider.getInstance()
-          .get((SimpleHive2JdbcConnDesc) desc);
+  @Override public Connection get(DESC desc) {
+    try {
+      return DriverManager.getConnection(desc.toUrl(),desc.user(),desc.password());
+    } catch (SQLException e) {
+      logger.warn("get jdbc connection failed", e);
+      throw new RuntimeException("get connection failed", e);
     }
-    throw new RuntimeException(String
-        .format("jdbc connection not acquired with jdbc description : %s ",
-            desc));
   }
 
   // singleton
-  private WrappedConnectionProvider() {
+  private SimpleHiveConnectionProvider() {
   }
 
-  private static WrappedConnectionProvider instance =
-      new WrappedConnectionProvider();
+  private static SimpleHiveConnectionProvider instance =
+      new SimpleHiveConnectionProvider<SimpleHive2JdbcConnDesc>();
 
-  public static WrappedConnectionProvider getInstance() {
+  public static SimpleHiveConnectionProvider getInstance() {
     return instance;
   }
 

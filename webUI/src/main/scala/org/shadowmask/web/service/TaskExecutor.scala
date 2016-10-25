@@ -16,29 +16,21 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection.description;
+package org.shadowmask.web.service
 
-/**
- * base class of hive2 server connection description information.
- */
-public abstract class Hive2JdbcConnDesc implements JDBCConnectionDesc {
+import org.shadowmask.framework.executor.{NewThreadTaskExecutor, TaskExecutor}
+import org.shadowmask.framework.task.{ProcedureWatcher, Task}
 
-  @Override public String prefix() {
-    return "hive2";
-  }
+// singelton
+class Executor extends TaskExecutor {
+  val executor = new NewThreadTaskExecutor
 
-  // default schema .
-  @Override public String schema() {
-    return "default";
-  }
+  override def executeTaskAsync(task: Task[_ <: ProcedureWatcher]): Unit =
+    executor.executeTaskAsync(task)
+}
 
-  //hive server default port .
-  @Override public int port() {
-    return 10000;
-  }
+object Executor {
+  def instance = new Executor
 
-  @Override public String toUrl() {
-    return String
-        .format("jdbc:%s://%s:%s/%s", prefix(), host(), port(), schema());
-  }
+  def apply(): Executor = instance;
 }

@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,29 +17,18 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection.description;
+package org.shadowmask.web.service
 
-/**
- * base class of hive2 server connection description information.
- */
-public abstract class Hive2JdbcConnDesc implements JDBCConnectionDesc {
+import org.shadowmask.framework.datacenter.hive.HiveDcContainer
 
-  @Override public String prefix() {
-    return "hive2";
-  }
-
-  // default schema .
-  @Override public String schema() {
-    return "default";
-  }
-
-  //hive server default port .
-  @Override public int port() {
-    return 10000;
-  }
-
-  @Override public String toUrl() {
-    return String
-        .format("jdbc:%s://%s:%s/%s", prefix(), host(), port(), schema());
-  }
+class HiveDataCenters(val dc:HiveDcContainer) {
 }
+object HiveDataCenters{
+  val instance = new HiveDataCenters({
+    val container = new HiveDcContainer
+    container.initFromPropFile("hive_dc")
+    container
+  })
+  def apply(): HiveDataCenters = instance;
+}
+

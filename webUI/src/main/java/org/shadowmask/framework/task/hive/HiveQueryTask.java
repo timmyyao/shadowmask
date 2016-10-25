@@ -21,18 +21,19 @@ import org.shadowmask.jdbc.connection.ConnectionProvider;
 import org.shadowmask.jdbc.connection.WrappedHiveConnectionProvider;
 import org.shadowmask.framework.task.ProcedureWatcher;
 import org.shadowmask.framework.task.QueryJdbcTask;
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
 
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class HiveQueryTask<T extends Serializable>
-    extends QueryJdbcTask<T, ProcedureWatcher> {
+public abstract class HiveQueryTask<T extends Serializable, DESC extends JDBCConnectionDesc>
+    extends QueryJdbcTask<T, ProcedureWatcher, DESC> {
 
   List<T> res = null;
 
-  ConnectionProvider connectionProvider;
+  ConnectionProvider<DESC> connectionProvider;
 
   @Override public void setUp() {
     super.setUp();
@@ -49,10 +50,11 @@ public abstract class HiveQueryTask<T extends Serializable>
   }
 
   @Override public Connection connectDB() {
-    if (connectionDesc() != null)
+    if (connectionDesc() != null) {
       return connectionProvider.get(connectionDesc());
-    else
+    } else {
       return connectionProvider.get();
+    }
   }
 
 }

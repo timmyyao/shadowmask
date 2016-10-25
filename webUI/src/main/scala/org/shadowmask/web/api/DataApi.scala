@@ -25,6 +25,7 @@ import org.scalatra.servlet.FileUploadSupport
 import org.scalatra.swagger._
 import org.shadowmask.web.common.user.{ConfiguredAuthProvider, User}
 import org.shadowmask.web.model._
+import org.shadowmask.web.service.HiveService
 
 class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
   with FileUploadSupport
@@ -72,7 +73,7 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
   val dataSchemaGetOperation = (apiOperation[SchemaResult]("dataSchemaGet")
     summary "get schemas of datasources ."
     parameters(headerParam[String]("Authorization").description("authentication token"),
-    formParam[String]("source").description("database type, HIVE,SPARK, etc"))
+    queryParam[String]("source").description("database type, HIVE,SPARK, etc"))
     )
 
   get("/schema", operation(dataSchemaGetOperation)) {
@@ -87,70 +88,72 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
 
     println("source: " + source)
 
+    HiveService().getSchemaViewObject()
 
 
-    SchemaResult(
-      0,
-      "ok",
-      List(
-        SchemaObjectParent(
-          "HIVE",
-          List(
-            SchemaObject(
-              "schema1",
-              "schemaName",
-              List(
-                TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc")
-              )
-            ),
-            SchemaObject(
-              "schema1",
-              "schemaName",
-              List(
-                TableProp("table1", "tabledesc")
-              )
-            ),
-            SchemaObject(
-              "schema1",
-              "schemaName",
-              List(
-                TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc")
-              )
-            )
-          )
-        ),
-        SchemaObjectParent(
-          "SPARK",
-          List(
-            SchemaObject(
-              "schema1",
-              "schemaName",
-              List(
-                TableProp("table1", "tabledesc")
-              )
-            )
-          )
-        )
-
-      )
-    )
+    //
+    //    SchemaResult(
+    //      0,
+    //      "ok",
+    //      List(
+    //        SchemaObjectParent(
+    //          "HIVE",
+    //          List(
+    //            SchemaObject(
+    //              "schema1",
+    //              "schemaName",
+    //              List(
+    //                TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc")
+    //              )
+    //            ),
+    //            SchemaObject(
+    //              "schema1",
+    //              "schemaName",
+    //              List(
+    //                TableProp("table1", "tabledesc")
+    //              )
+    //            ),
+    //            SchemaObject(
+    //              "schema1",
+    //              "schemaName",
+    //              List(
+    //                TableProp("table1", "tabledesc"), TableProp("table1", "tabledesc")
+    //              )
+    //            )
+    //          )
+    //        ),
+    //        SchemaObjectParent(
+    //          "SPARK",
+    //          List(
+    //            SchemaObject(
+    //              "schema1",
+    //              "schemaName",
+    //              List(
+    //                TableProp("table1", "tabledesc")
+    //              )
+    //            )
+    //          )
+    //        )
+    //
+    //      )
+    //    )
   }
 
 
   val dataTableGetOperation = (apiOperation[TableResult]("dataTableGet")
     summary "get n-first record of a table"
     parameters(headerParam[String]("Authorization").description("authentication token"),
-    formParam[String]("source").description("database type, HIVE,SPARK, etc"),
-    formParam[String]("datasetType").description("data set type ,TABLE,VIEW"),
-    formParam[String]("schema").description("the schema which the datasetType belongs to."),
-    formParam[String]("name").description("table/view name"),
-    formParam[Int]("rows").description("number of rows"))
+    queryParam[String]("source").description("database type, HIVE,SPARK, etc"),
+    queryParam[String]("datasetType").description("data set type ,TABLE,VIEW"),
+    queryParam[String]("schema").description("the schema which the datasetType belongs to."),
+    queryParam[String]("name").description("table/view name"),
+    queryParam[Int]("rows").description("number of rows"))
     )
 
   get("/table", operation(dataTableGetOperation)) {
 
 
-    val authToken = request.getHeader("authToken")
+    val authToken = request.getHeader("Authorization")
 
     println("authToken: " + authToken)
 
@@ -179,27 +182,31 @@ class DataApi(implicit val swagger: Swagger) extends ScalatraServlet
 
     println("rows: " + rows)
 
+    HiveService().getTableViewObject(source.get,schema.get,name.get,rows.get)
+//    HiveService().getTableViewObject("dc1","tests","user_info",10)
 
-    TableResult(
-      0,
-      "ok",
-      TableContent(
-        List(
-          TableTitle("id", "ID", "ID", "#0000FF"),
-          TableTitle("username", "user's name ", "HALF_ID", "#0000FF"),
-          TableTitle("url", "some web site", "SENSITIVE", "#0000FF"),
-          TableTitle("addr", "address", "NONE_SENSITIVE", "#0000FF")
-        ),
-        List(
-          List("1", "tom", "http://ww.a.com", "qianmendajie"),
-          List("2", "tom", "http://ww.cca.com", "renminguangchang"),
-          List("3", "tom", "http://ww.dda.com", "东方明珠"),
-          List("6", "tom", "http://ww.aff.com", "united states"),
-          List("4", "tom", "http://ww.add.com", "japan"),
-          List("2", "tom", "http://ww.cca.com", "earth")
-        )
-      )
-    )
+
+
+//    TableResult(
+//      0,
+//      "ok",
+//      TableContent(
+//        List(
+//          TableTitle("id", "ID", "ID", "#0000FF"),
+//          TableTitle("username", "user's name ", "HALF_ID", "#0000FF"),
+//          TableTitle("url", "some web site", "SENSITIVE", "#0000FF"),
+//          TableTitle("addr", "address", "NONE_SENSITIVE", "#0000FF")
+//        ),
+//        List(
+//          List("1", "tom", "http://ww.a.com", "qianmendajie"),
+//          List("2", "tom", "http://ww.cca.com", "renminguangchang"),
+//          List("3", "tom", "http://ww.dda.com", "东方明珠"),
+//          List("6", "tom", "http://ww.aff.com", "united states"),
+//          List("4", "tom", "http://ww.add.com", "japan"),
+//          List("2", "tom", "http://ww.cca.com", "earth")
+//        )
+//      )
+//    )
   }
 
 

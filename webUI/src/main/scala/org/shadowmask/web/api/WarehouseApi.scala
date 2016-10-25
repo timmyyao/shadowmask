@@ -181,7 +181,11 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   val warehousePrivacyRiskGetOperation = (apiOperation[PriRiskResult]("warehousePrivacyRiskGet")
     summary "fetch all mask rules supported ."
-    parameters(headerParam[String]("Authorization").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""))
+    parameters(headerParam[String]("Authorization").description(""),
+    queryParam[String]("source").description(""),
+    queryParam[String]("datasetType").description(""),
+    queryParam[String]("schema").description(""),
+    queryParam[String]("name").description(""))
     )
 
   get("/privacyRisk", operation(warehousePrivacyRiskGetOperation)) {

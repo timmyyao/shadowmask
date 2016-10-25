@@ -15,30 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.shadowmask.jdbc.connection.description;
 
-/**
- * base class of hive2 server connection description information.
- */
-public abstract class Hive2JdbcConnDesc implements JDBCConnectionDesc {
+public abstract class SimpleHive2JdbcConnDesc extends Hive2JdbcConnDesc {
 
-  @Override public String prefix() {
-    return "hive2";
-  }
+  // simple connection username
+  abstract public String user();
 
-  // default schema .
-  @Override public String schema() {
-    return "default";
-  }
-
-  //hive server default port .
-  @Override public int port() {
-    return 10000;
-  }
-
-  @Override public String toUrl() {
-    return String
-        .format("jdbc:%s://%s:%s/%s", prefix(), host(), port(), schema());
-  }
+  // simple connection user' password .
+  abstract public String password();
 }

@@ -48,7 +48,7 @@
         "summary": "get all users.",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -70,7 +70,7 @@
         "summary": "grant priviledges.",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -126,7 +126,7 @@
         "summary": "Adminstrator login api",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -134,7 +134,7 @@
           },
           {
             "name": "source",
-            "in": "formData",
+            "in": "query",
             "description": "hive,spark,etc",
             "required": true,
             "type": "string"
@@ -155,7 +155,7 @@
         "summary": "get n-first record of a table",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -163,35 +163,35 @@
           },
           {
             "name": "source",
-            "in": "formData",
+            "in": "query",
             "description": "HIVE,SPARK, etc.",
             "required": true,
             "type": "string"
           },
           {
             "name": "datasetType",
-            "in": "formData",
+            "in": "query",
             "description": "VIEW,TABLE,etc",
             "required": true,
             "type": "string"
           },
           {
             "name": "schema",
-            "in": "formData",
+            "in": "query",
             "description": "the schema witch the dataset belongs to",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "in": "formData",
+            "in": "query",
             "description": "name of dataset",
             "required": true,
             "type": "string"
           },
           {
             "name": "rows",
-            "in": "formData",
+            "in": "query",
             "description": "how many rows will get",
             "required": true,
             "type": "integer"
@@ -212,7 +212,7 @@
         "summary": "get all cloumn types",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -234,7 +234,7 @@
         "summary": "delete an table",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -284,7 +284,7 @@
         "summary": "fetch all mask rules supported .",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -306,7 +306,7 @@
         "summary": "fetch all mask rules supported .",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -336,7 +336,7 @@
         "summary": "fetch all mask rules supported .",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -344,28 +344,28 @@
           },
           {
             "name": "source",
-            "in": "formData",
+            "in": "query",
             "description": "HIVE,SPARK, etc.",
             "required": true,
             "type": "string"
           },
           {
             "name": "datasetType",
-            "in": "formData",
+            "in": "query",
             "description": "VIEW,TABLE,etc",
             "required": true,
             "type": "string"
           },
           {
             "name": "schema",
-            "in": "formData",
+            "in": "query",
             "description": "the schema witch the dataset belongs to",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "in": "formData",
+            "in": "query",
             "description": "name of dataset",
             "required": true,
             "type": "string"

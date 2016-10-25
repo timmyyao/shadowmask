@@ -19,6 +19,7 @@
 package org.shadowmask.framework.task;
 
 import org.apache.log4j.Logger;
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -27,14 +28,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureWatcher>
-    extends JDBCTask<W> {
+public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureWatcher,DESC extends JDBCConnectionDesc>
+    extends JDBCTask<W,DESC> {
   Logger logger = Logger.getLogger(this.getClass());
 
   @Override public void setUp() {
   }
 
-  @Override public boolean rollbackAble() {
+  @Override public boolean transationSupport() {
     return false;
   }
 

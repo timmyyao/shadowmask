@@ -21,13 +21,14 @@ import org.shadowmask.framework.task.ExecutedJdbcTask;
 import org.shadowmask.framework.task.RollbackableProcedureWatcher;
 import org.shadowmask.jdbc.connection.ConnectionProvider;
 import org.shadowmask.jdbc.connection.WrappedHiveConnectionProvider;
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
 
 import java.sql.Connection;
 
-public abstract class HiveExecutionTask
-    extends ExecutedJdbcTask<RollbackableProcedureWatcher> {
+public abstract class HiveExecutionTask<DESC extends JDBCConnectionDesc>
+    extends ExecutedJdbcTask<RollbackableProcedureWatcher,DESC> {
 
-  ConnectionProvider connectionProvider;
+  ConnectionProvider<DESC> connectionProvider;
 
   @Override public void setUp() {
     connectionProvider = WrappedHiveConnectionProvider.getInstance();
@@ -40,7 +41,7 @@ public abstract class HiveExecutionTask
       return connectionProvider.get();
   }
 
-  @Override public boolean rollbackAble() {
+  @Override public boolean transationSupport() {
     return false;
   }
 

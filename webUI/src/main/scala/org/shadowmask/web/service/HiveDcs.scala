@@ -16,29 +16,18 @@
  * limitations under the License.
  */
 
-package org.shadowmask.jdbc.connection.description;
+package org.shadowmask.web.service
+
+import org.shadowmask.framework.datacenter.hive.HiveDcContainer
+
 
 /**
- * base class of hive2 server connection description information.
- */
-public abstract class Hive2JdbcConnDesc implements JDBCConnectionDesc {
-
-  @Override public String prefix() {
-    return "hive2";
-  }
-
-  // default schema .
-  @Override public String schema() {
-    return "default";
-  }
-
-  //hive server default port .
-  @Override public int port() {
-    return 10000;
-  }
-
-  @Override public String toUrl() {
-    return String
-        .format("jdbc:%s://%s:%s/%s", prefix(), host(), port(), schema());
+  * all hive data centers
+  */
+object HiveDcs {
+  val dcCotainer:HiveDcContainer = {
+    val dc  = new HiveDcContainer
+    dc.initFromPropFile("hive_dc")
+    dc
   }
 }

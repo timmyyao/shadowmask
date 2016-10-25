@@ -21,15 +21,10 @@ package org.shadowmask.web.common.user
 import java.util.ResourceBundle
 
 import authentikat.jwt.{JsonWebToken, JwtClaimsSet, JwtHeader}
-import org.apache.directory.api.ldap.model.cursor.EntryCursor
 import org.apache.directory.api.ldap.model.entry.Entry
 import org.apache.directory.api.ldap.model.message.SearchScope
 import org.apache.directory.ldap.client.api.{LdapConnection, LdapNetworkConnection}
-import org.shadowmask.model.datareader.{Command, Consumer}
-import org.shadowmask.utils.NeverThrow
 import org.shadowmask.web.utils.MD5Hasher
-
-import scala.util.Try
 
 /**
   * abstract parent class
@@ -279,9 +274,9 @@ object LdapToolKit {
       accessLdap[List[LdapUser]](conn=>{
         conn.bind(manager,managerPwd)
         val cursor = conn.search(userDomain,"(objectclass=*)",SearchScope.SUBTREE)
-        val list = Nil
+        var list:List[LdapUser] = Nil
         while (cursor.next()){
-          new LdapUser(cursor.get()) :: list
+          list = new LdapUser(cursor.get()) :: list
         }
         list
       },(conn,e)=>{

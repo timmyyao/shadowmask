@@ -15,30 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.shadowmask.jdbc.connection.description;
+package org.shadowmask.framework.datacenter.hive;
 
 /**
- * base class of hive2 server connection description information.
+ * simple hive data center
  */
-public abstract class Hive2JdbcConnDesc implements JDBCConnectionDesc {
+public class SimpleHiveDc extends HiveDc {
+  private String username;
+  private String passowrd;
 
-  @Override public String prefix() {
-    return "hive2";
-  }
-
-  // default schema .
-  @Override public String schema() {
-    return "default";
-  }
-
-  //hive server default port .
-  @Override public int port() {
-    return 10000;
-  }
-
-  @Override public String toUrl() {
+  @Override String url() {
     return String
-        .format("jdbc:%s://%s:%s/%s", prefix(), host(), port(), schema());
+        .format("jdbc:%s://%s:%s/%s", getServerType(), getHost(), getPort(),
+            "default");
+  }
+
+  public void init() throws ClassNotFoundException {
+    Class.forName(getJdbcDriver());
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getPassowrd() {
+    return passowrd;
+  }
+
+  public void setPassowrd(String passowrd) {
+    this.passowrd = passowrd;
   }
 }
