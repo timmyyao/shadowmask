@@ -15,23 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.utils;
 
-package org.shadowmask.web.service
+public class ReThrow {
 
-import org.shadowmask.framework.executor.{NewThreadTaskExecutor, TaskExecutor}
-import org.shadowmask.framework.task.{ProcedureWatcher, Task, Watcher}
-
-// singelton
-class Executor extends TaskExecutor {
-  val executor = new NewThreadTaskExecutor
-
-  override def executeTaskAsync(task: Task[_ <: Watcher]): Unit = {
-    executor.executeTaskAsync(task)
+  public static void rethrow(Throwable e) {
+    if (e instanceof RuntimeException) {
+      throw (RuntimeException) e;
+    } else {
+      throw new RuntimeException(e);
+    }
   }
-}
-
-object Executor {
-  def instance = new Executor
-
-  def apply(): Executor = instance;
 }

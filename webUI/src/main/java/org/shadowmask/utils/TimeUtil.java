@@ -16,22 +16,18 @@
  * limitations under the License.
  */
 
-package org.shadowmask.web.service
+package org.shadowmask.utils;
 
-import org.shadowmask.framework.executor.{NewThreadTaskExecutor, TaskExecutor}
-import org.shadowmask.framework.task.{ProcedureWatcher, Task, Watcher}
+/**
+ *  tool of time
+ */
+public class TimeUtil {
 
-// singelton
-class Executor extends TaskExecutor {
-  val executor = new NewThreadTaskExecutor
-
-  override def executeTaskAsync(task: Task[_ <: Watcher]): Unit = {
-    executor.executeTaskAsync(task)
+  /**
+   *  now's millisecond
+   * @return
+   */
+  public static long nowMs() {
+    return System.currentTimeMillis();
   }
-}
-
-object Executor {
-  def instance = new Executor
-
-  def apply(): Executor = instance;
 }

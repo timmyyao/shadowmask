@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @Description: class that can be watched by ProcedureWatcher.
  */
-public interface Watchable<W extends ProcedureWatcher> {
+public interface Watchable<W extends Watcher> {
 
   /**
    * register a Watcher
@@ -49,5 +49,25 @@ public interface Watchable<W extends ProcedureWatcher> {
    * @return
    */
   List<W> getAllWatchers();
+
+
+  /**
+   * trigger preStart
+   */
+  void triggerPreStart() ;
+
+
+  /**
+   * trigger Complete
+   */
+  void triggerComplete() ;
+
+  /**
+   * trigger Exception
+   *
+   * @param throwable
+   */
+  void triggerException(final Throwable throwable);
+
 
 }

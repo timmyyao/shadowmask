@@ -20,6 +20,7 @@ package org.shadowmask.framework.task;
 
 import org.apache.log4j.Logger;
 import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
+import org.shadowmask.utils.ReThrow;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -28,8 +29,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureWatcher,DESC extends JDBCConnectionDesc>
-    extends JDBCTask<W,DESC> {
+public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureWatcher, DESC extends JDBCConnectionDesc>
+    extends JDBCTask<W, DESC> {
   Logger logger = Logger.getLogger(this.getClass());
 
   @Override public void setUp() {
@@ -60,12 +61,13 @@ public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureW
    */
   public abstract List<T> queryResults();
 
-  @Override public void invoke() {
-    Connection connection = null;
+  Connection connection = null;
+
+  @Override public void run() {
     PreparedStatement stm = null;
+    connection = connectDB();
+    triggerConnectionBuilt(connection);
     try {
-      triggerPreStart();
-      connection = connectDB();
       stm = connection.prepareStatement(sql());
       ResultSet resultSet = stm.executeQuery();
       if (resultSet != null) {
@@ -73,11 +75,8 @@ public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureW
           collect(collector().collect(resultSet));
         }
       }
-      triggerComplete();
-    } catch (Throwable e) {
-      triggerException(e);
-      logger.warn(
-          String.format("Exception occurred when execute sql[ %s ]", sql()), e);
+    } catch (SQLException e) {
+      ReThrow.rethrow(e);
     } finally {
       if (stm != null) {
         try {
@@ -87,6 +86,21 @@ public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureW
               .format("Exception occurred when close statement[ %s ]", stm), e);
         }
       }
+    }
+
+  }
+
+  @Override public void invoke() {
+    try {
+      triggerPreStart();
+      run();
+      triggerComplete();
+    } catch (Throwable e) {
+      triggerException(e);
+      logger.warn(
+          String.format("Exception occurred when execute sql[ %s ]", sql()), e);
+      ReThrow.rethrow(e);
+    } finally {
       if (connection != null) {
         try {
           connection.close();
@@ -94,6 +108,7 @@ public abstract class QueryJdbcTask<T extends Serializable, W extends ProcedureW
           logger.warn(String
               .format("Exception occurred when release connection[ %s ]",
                   connection), e);
+          ReThrow.rethrow(e);
         }
       }
     }

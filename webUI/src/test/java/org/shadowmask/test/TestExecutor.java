@@ -23,6 +23,7 @@ import org.shadowmask.framework.executor.TaskExecutor;
 import org.shadowmask.framework.task.ProcedureWatcher;
 import org.shadowmask.framework.task.Task;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +85,10 @@ public class TestExecutor {
           System.out.println("on start ");
         }
 
+        @Override public void onConnection(Connection connection) {
+
+        }
+
         @Override public void onComplete() {
           System.out.println("on completed ");
         }
@@ -94,6 +99,10 @@ public class TestExecutor {
       task.registerWatcher(new ProcedureWatcher() {
         @Override public void preStart() {
           System.out.println("on start2 ");
+        }
+
+        @Override public void onConnection(Connection connection) {
+
         }
 
         @Override public void onComplete() {

@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
 import org.shadowmask.model.datareader.Command;
 import org.shadowmask.utils.NeverThrow;
+import org.shadowmask.utils.ReThrow;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,20 +34,16 @@ public abstract class ExecutedJdbcTask<W extends RollbackableProcedureWatcher, D
     extends JDBCTask<W, DESC> {
   Logger logger = Logger.getLogger(this.getClass());
 
+  Connection connection = null;
+
   @Override public void invoke() {
-    Connection connection = null;
+
     try {
       triggerPreStart();
-      connection = connectDB();
-      PreparedStatement stm = connection.prepareStatement(sql());
-      stm.execute();
-      if (transationSupport()) {
-        connection.commit();
-      }
+      run();
       triggerComplete();
     } catch (Exception e) {
       e.printStackTrace();
-
       logger.warn(
           String.format("Exception occurred when execute sql[ %s ]", sql()), e);
       triggerException(e);
@@ -59,6 +56,7 @@ public abstract class ExecutedJdbcTask<W extends RollbackableProcedureWatcher, D
           triggerRollbackException(e1);
         }
       }
+      ReThrow.rethrow(e);
     } finally {
       if (connection != null)
         try {
@@ -67,8 +65,25 @@ public abstract class ExecutedJdbcTask<W extends RollbackableProcedureWatcher, D
           logger.warn(String
               .format("Exception occurred when release connection[ %s ]",
                   connection), e);
+          ReThrow.rethrow(e);
         }
     }
+  }
+
+  @Override public void run() {
+    connection = connectDB();
+    triggerConnectionBuilt(connection);
+    PreparedStatement stm = null;
+    try {
+      stm = connection.prepareStatement(sql());
+      stm.execute();
+      if (transationSupport()) {
+        connection.commit();
+      }
+    } catch (SQLException e) {
+      ReThrow.rethrow(e);
+    }
+
   }
 
   /**

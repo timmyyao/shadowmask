@@ -18,17 +18,19 @@
 package org.shadowmask.model.data;
 
 public enum TitleType {
-  ID("ID", "唯一标示符号"),
-  HALF_ID("HALF_ID", "半标示符号"),
-  SENSITIVE("SENSITIVE", "敏感数据"),
-  NONE_SENSITIVE("NONE_SENSITIVE", "非敏感数据"),
-  UNKNOWN("UNKNOWN", "未标记数据");
+  ID("ID", "唯一标示符","#02D5A6"),
+  HALF_ID("HALF_ID", "半标示符","#F5A623"),
+  SENSITIVE("SENSITIVE", "敏感数据","#F76E7F"),
+  NONE_SENSITIVE("NONE_SENSITIVE", "非敏感数据","#4A90E2"),
+  UNKNOWN("UNKNOWN", "未标记数据","");
 
   public String name;
   public String desc;
+  public String color;
 
-  TitleType(String name, String desc) {
+  TitleType(String name, String desc,String color) {
     this.name = name;
     this.desc = desc;
+    this.color=color;
   }
 }

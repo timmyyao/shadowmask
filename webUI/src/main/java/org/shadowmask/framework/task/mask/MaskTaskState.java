@@ -15,23 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.shadowmask.framework.task.mask;
 
-package org.shadowmask.web.service
-
-import org.shadowmask.framework.executor.{NewThreadTaskExecutor, TaskExecutor}
-import org.shadowmask.framework.task.{ProcedureWatcher, Task, Watcher}
-
-// singelton
-class Executor extends TaskExecutor {
-  val executor = new NewThreadTaskExecutor
-
-  override def executeTaskAsync(task: Task[_ <: Watcher]): Unit = {
-    executor.executeTaskAsync(task)
-  }
-}
-
-object Executor {
-  def instance = new Executor
-
-  def apply(): Executor = instance;
+/**
+ * enum of task states .
+ */
+public enum MaskTaskState {
+  CREATED,SUBMITTED, RUNNING, FINISHED, EXCEPTED
 }

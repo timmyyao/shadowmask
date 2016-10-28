@@ -1,3 +1,5 @@
+
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,22 +18,24 @@
  * limitations under the License.
  */
 
-package org.shadowmask.web.service
+package org.shadowmask.test
 
-import org.shadowmask.framework.executor.{NewThreadTaskExecutor, TaskExecutor}
-import org.shadowmask.framework.task.{ProcedureWatcher, Task, Watcher}
+import org.junit.Test
+import org.shadowmask.web.api.SqlFuncTemplate
+import org.junit.Assert._
 
-// singelton
-class Executor extends TaskExecutor {
-  val executor = new NewThreadTaskExecutor
+class TestSql {
 
-  override def executeTaskAsync(task: Task[_ <: Watcher]): Unit = {
-    executor.executeTaskAsync(task)
+  @Test
+  def testSqlFun():Unit = {
+    var tmp = new SqlFuncTemplate("sub",List(("name","string"),("level","int")))
+    assertEquals(tmp.toSql("email",Map("name"->"xxx","level"->"3")),"sub(email,'xxx',3)")
+
+    tmp = new SqlFuncTemplate("sub",List(("name","string"),("level","string")))
+    assertEquals(tmp.toSql("email",Map("name"->"xxx","level"->"3")),"sub(email,'xxx','3')")
+
+    tmp = new SqlFuncTemplate("sub",List())
+    assertEquals(tmp.toSql("email",Map("name"->"xxx","level"->"3")),"sub(email)")
   }
-}
 
-object Executor {
-  def instance = new Executor
-
-  def apply(): Executor = instance;
 }

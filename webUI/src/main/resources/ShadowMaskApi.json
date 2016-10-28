@@ -229,6 +229,56 @@
         }
       }
     },
+    "/data/task": {
+      "get": {
+        "summary": "fetch all task in some state .",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "taskType",
+            "in": "query",
+            "description": "0-submited,1-finished,2-failed",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fetchType",
+            "in": "query",
+            "description": "0-all,1-paging",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "index of page , 0-based ,default to 0",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "size of the page",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/TaskResult"
+            }
+          }
+        }
+      }
+    },
     "/warehouse/dataset/delete": {
       "post": {
         "summary": "delete an table",
@@ -586,6 +636,49 @@
           "type": "string"
         },
         "color": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "totalNum": {
+              "type": "integer"
+            },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TaskViewObject"
+              }
+            }
+          }
+        }
+      }
+    },
+    "TaskViewObject": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "name of the task"
+        },
+        "submitedTime": {
+          "type": "string"
+        },
+        "finishedTime": {
+          "type": "string"
+        },
+        "exceptedTime": {
           "type": "string"
         }
       }

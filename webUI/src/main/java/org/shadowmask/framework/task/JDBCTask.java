@@ -29,7 +29,8 @@ import java.util.List;
 /**
  * jdbc task
  */
-public abstract class JDBCTask<W extends ProcedureWatcher,DESC extends JDBCConnectionDesc> implements Task<W> {
+public abstract class JDBCTask<W extends ProcedureWatcher, DESC extends JDBCConnectionDesc>
+    extends Task<W> {
 
   private final List<W> watchers = new ArrayList<>();
 
@@ -49,47 +50,17 @@ public abstract class JDBCTask<W extends ProcedureWatcher,DESC extends JDBCConne
     return watchers;
   }
 
+
+
   /**
    * trigger preStart
    */
-  void triggerPreStart() {
+  void triggerConnectionBuilt(final Connection connection) {
     if (getAllWatchers() != null) {
       for (final W w : getAllWatchers()) {
         NeverThrow.exe(new Command() {
           @Override public void exe() {
-            w.preStart();
-          }
-        }, new NeverThrow.LoggerConsumer(), null);
-      }
-    }
-  }
-
-  /**
-   * trigger Complete
-   */
-  void triggerComplete() {
-    if (getAllWatchers() != null) {
-      for (final W w : getAllWatchers()) {
-        NeverThrow.exe(new Command() {
-          @Override public void exe() {
-            w.onComplete();
-          }
-        }, new NeverThrow.LoggerConsumer(), null);
-      }
-    }
-  }
-
-  /**
-   * trigger Exception
-   *
-   * @param throwable
-   */
-  void triggerException(final Throwable throwable) {
-    if (getAllWatchers() != null) {
-      for (final W w : getAllWatchers()) {
-        NeverThrow.exe(new Command() {
-          @Override public void exe() {
-            w.onException(throwable);
+            w.onConnection(connection);
           }
         }, new NeverThrow.LoggerConsumer(), null);
       }

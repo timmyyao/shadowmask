@@ -16,22 +16,25 @@
  * limitations under the License.
  */
 
-package org.shadowmask.web.service
+package org.shadowmask.framework.task;
 
-import org.shadowmask.framework.executor.{NewThreadTaskExecutor, TaskExecutor}
-import org.shadowmask.framework.task.{ProcedureWatcher, Task, Watcher}
+import java.sql.Connection;
 
-// singelton
-class Executor extends TaskExecutor {
-  val executor = new NewThreadTaskExecutor
+public interface Watcher {
+  /**
+   * executed before procedure start .
+   */
+  void preStart();
 
-  override def executeTaskAsync(task: Task[_ <: Watcher]): Unit = {
-    executor.executeTaskAsync(task)
-  }
-}
+  /**
+   * executed after procedure compleled .
+   */
+  void onComplete();
 
-object Executor {
-  def instance = new Executor
-
-  def apply(): Executor = instance;
+  /**
+   * executed after an exception occurred .
+   *
+   * @param e
+   */
+  void onException(Throwable e);
 }
