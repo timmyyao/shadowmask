@@ -33,9 +33,11 @@ public class EmailRuleTest {
     RuleContext context = new RuleContext();
     EmailRule rule = new EmailRule(context);
     rule.setColumnName("email");
-    rule.setColumnValue("zhangsan@xxx.com");
+    rule.setColumnValue("zhangsan123@xxx.com");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("zhangsan@xxx.com.cn");
+    rule.setColumnValue("Zhang_san@xxx.com.cn");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("zhang.san@xxx.org");
     assertEquals(true, rule.evaluate());
   }
 
@@ -48,7 +50,7 @@ public class EmailRuleTest {
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("zhangsan@xx@yy.com");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhangsan@xx");
+    rule.setColumnValue("zhangsan@xx.sss");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("zhang.san@xx");
     assertEquals(false, rule.evaluate());

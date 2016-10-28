@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.shadowmask.core.discovery.rules;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.shadowmask.core.discovery.DataDiscoveryException;
 import org.shadowmask.core.discovery.RuleContext;
 
@@ -35,7 +35,9 @@ public class EmailRule extends QusiIdentifierRule {
           "Should fill the column value before fire inspect rules.");
     }
 
-    int locationOfAt = value.indexOf('@');
+    EmailValidator emailValidator = EmailValidator.getInstance();
+    return emailValidator.isValid(value);
+    /*int locationOfAt = value.indexOf('@');
     // there is only one '@' in the value and not in the beginning
     if (locationOfAt > 0 && locationOfAt == value.lastIndexOf('@')) {
       int locationOfDot = value.lastIndexOf('.');
@@ -44,6 +46,6 @@ public class EmailRule extends QusiIdentifierRule {
         return true;
       }
     }
-    return false;
+    return false;*/
   }
 }
