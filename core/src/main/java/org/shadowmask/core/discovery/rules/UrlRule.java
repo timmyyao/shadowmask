@@ -17,11 +17,9 @@
  */
 package org.shadowmask.core.discovery.rules;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.shadowmask.core.discovery.DataDiscoveryException;
 import org.shadowmask.core.discovery.RuleContext;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This rule would evaluate whether the column value is an URL address.
@@ -35,10 +33,11 @@ public class UrlRule extends QusiIdentifierRule {
           "Should fill the column value before fire inspect rules.");
     }
 
-    String valueLower = value.toLowerCase();
-    String urlRegex = "((http|ftp|https)://)|(www\\.)";
-    Pattern urlPattern = Pattern.compile(urlRegex);
-    Matcher urlMatcher = urlPattern.matcher(valueLower);
-    return urlMatcher.find();
+    String urlValue = value;
+    if (!(value.startsWith("http://") || value.startsWith("https://") || value.startsWith("ftp://"))) {
+      urlValue = "http://" + value;
+    }
+    UrlValidator urlValidator = new UrlValidator();
+    return urlValidator.isValid(urlValue);
   }
 }

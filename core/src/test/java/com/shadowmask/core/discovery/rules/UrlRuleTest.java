@@ -46,17 +46,15 @@ public class UrlRuleTest {
     RuleContext context = new RuleContext();
     UrlRule rule = new UrlRule(context);
     rule.setColumnName("url");
+    rule.setColumnValue("http://www.google.com");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("ftp://go-ogle.cn");
+    assertEquals(true, rule.evaluate());
     rule.setColumnValue("www.intel.com");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("http://www.intel.com");
+    rule.setColumnValue("https://www.intel.com.cn/home#45");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("ftp://intel.com");
-    assertEquals(true, rule.evaluate());
-    rule.setColumnValue("https://www.intel.com.cn/home");
-    assertEquals(true, rule.evaluate());
-    rule.setColumnValue("HTTP://intel.com");
-    assertEquals(true, rule.evaluate());
-    rule.setColumnValue("Ftp://intel.com");
+    rule.setColumnValue("translator.google.com");
     assertEquals(true, rule.evaluate());
   }
 
@@ -65,11 +63,11 @@ public class UrlRuleTest {
     RuleContext context = new RuleContext();
     UrlRule rule = new UrlRule(context);
     rule.setColumnName("url");
-    rule.setColumnValue("ww.intel.com");
+    rule.setColumnValue("www.google.abc");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("http:/intel.com");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("23456");
+    rule.setColumnValue("234-56");
     assertEquals(false, rule.evaluate());
   }
 }
