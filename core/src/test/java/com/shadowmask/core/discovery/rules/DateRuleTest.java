@@ -20,24 +20,23 @@ package com.shadowmask.core.discovery.rules;
 import org.junit.Test;
 import org.shadowmask.core.discovery.DataDiscoveryException;
 import org.shadowmask.core.discovery.RuleContext;
-import org.shadowmask.core.discovery.rules.EmailRule;
+import org.shadowmask.core.discovery.rules.DateRule;
 import org.shadowmask.core.type.DataType;
 
 import static org.junit.Assert.assertEquals;
 
-public class EmailRuleTest {
-
+public class DateRuleTest {
   @Test(expected = DataDiscoveryException.class)
   public void testWithoutValue() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
+    DateRule rule = new DateRule(context);
     rule.evaluate();
   }
 
   @Test
   public void testDataType() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
+    DateRule rule = new DateRule(context);
     rule.execute();
     assertEquals(DataType.QUSI_IDENTIFIER, context.getDateType());
   }
@@ -45,28 +44,40 @@ public class EmailRuleTest {
   @Test
   public void testWithRightValue() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
-    rule.setColumnName("email");
-    rule.setColumnValue("zhangsan123@xxx.com");
+    DateRule rule = new DateRule(context);
+    rule.setColumnName("date");
+    rule.setColumnValue("2013-01-01");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("Zhang_san@xxx.com.cn");
+    rule.setColumnValue("1991/1/31");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("zhang.san@xxx.org");
+    rule.setColumnValue("19910323");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("1991.12.3");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("1991年2月1日");
     assertEquals(true, rule.evaluate());
   }
 
   @Test
   public void testWithWrongValue() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
-    rule.setColumnName("email");
-    rule.setColumnValue("zhangsan");
+    DateRule rule = new DateRule(context);
+    rule.setColumnName("date");
+    rule.setColumnValue("hello");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhangsan@xx@yy.com");
+    rule.setColumnValue("2000-13-12");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhangsan@xx.sss");
+    rule.setColumnValue("2000-0-12");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhang.san@xx");
+    rule.setColumnValue("2000-2-0");
+    assertEquals(false, rule.evaluate());
+    rule.setColumnValue("1990-11-31");
+    assertEquals(false, rule.evaluate());
+    rule.setColumnValue("2013:11:22");
+    assertEquals(false, rule.evaluate());
+    rule.setColumnValue("2003-3d-rr");
+    assertEquals(false, rule.evaluate());
+    rule.setColumnValue("2004--11");
     assertEquals(false, rule.evaluate());
   }
 }

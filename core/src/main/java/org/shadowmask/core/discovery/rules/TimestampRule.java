@@ -17,35 +17,37 @@
  */
 package org.shadowmask.core.discovery.rules;
 
-import org.apache.commons.validator.routines.EmailValidator;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.shadowmask.core.discovery.DataDiscoveryException;
 import org.shadowmask.core.discovery.RuleContext;
+import org.shadowmask.core.type.TimeFormatPattern;
 
 /**
- * This rule would evaluate whether the column value is an email address.
+ * This rule would evaluate whether the column value is a timestamp.
  */
-public class EmailRule extends QusiIdentifierRule {
-  public EmailRule(RuleContext ruleContext) {
-    super(ruleContext);
-  }
+public class TimestampRule extends QusiIdentifierRule {
+  public TimestampRule(RuleContext ruleContext) {super(ruleContext);}
 
   @Override public boolean evaluate() {
     if (value == null) {
       throw new DataDiscoveryException(
-          "Should fill the column value before fire inspect rules.");
+              "Should fill the column value before fire inspect rules.");
     }
-
-    EmailValidator emailValidator = EmailValidator.getInstance();
-    return emailValidator.isValid(value);
-    /*int locationOfAt = value.indexOf('@');
-    // there is only one '@' in the value and not in the beginning
-    if (locationOfAt > 0 && locationOfAt == value.lastIndexOf('@')) {
-      int locationOfDot = value.lastIndexOf('.');
-      // there is a '.' after '@'
-      if (locationOfDot > locationOfAt) {
+    DateTimeFormatter format;
+    DateTime dateTime;
+    for (String pattern : TimeFormatPattern.patterns) {
+      format = DateTimeFormat.forPattern(pattern);
+      try {
+        dateTime = DateTime.parse(value, format);
+      } catch (Exception e) {
+        continue;
+      }
+      if (dateTime != null) {
         return true;
       }
     }
-    return false;*/
+    return false;
   }
 }

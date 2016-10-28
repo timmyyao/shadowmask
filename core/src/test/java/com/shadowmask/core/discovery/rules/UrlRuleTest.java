@@ -20,24 +20,23 @@ package com.shadowmask.core.discovery.rules;
 import org.junit.Test;
 import org.shadowmask.core.discovery.DataDiscoveryException;
 import org.shadowmask.core.discovery.RuleContext;
-import org.shadowmask.core.discovery.rules.EmailRule;
+import org.shadowmask.core.discovery.rules.UrlRule;
 import org.shadowmask.core.type.DataType;
 
 import static org.junit.Assert.assertEquals;
 
-public class EmailRuleTest {
-
+public class UrlRuleTest {
   @Test(expected = DataDiscoveryException.class)
   public void testWithoutValue() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
+    UrlRule rule = new UrlRule(context);
     rule.evaluate();
   }
 
   @Test
   public void testDataType() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
+    UrlRule rule = new UrlRule(context);
     rule.execute();
     assertEquals(DataType.QUSI_IDENTIFIER, context.getDateType());
   }
@@ -45,28 +44,30 @@ public class EmailRuleTest {
   @Test
   public void testWithRightValue() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
-    rule.setColumnName("email");
-    rule.setColumnValue("zhangsan123@xxx.com");
+    UrlRule rule = new UrlRule(context);
+    rule.setColumnName("url");
+    rule.setColumnValue("http://www.google.com");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("Zhang_san@xxx.com.cn");
+    rule.setColumnValue("ftp://go-ogle.cn");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("zhang.san@xxx.org");
+    rule.setColumnValue("www.intel.com");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("https://www.intel.com.cn/home#45");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("translator.google.com");
     assertEquals(true, rule.evaluate());
   }
 
   @Test
   public void testWithWrongValue() {
     RuleContext context = new RuleContext();
-    EmailRule rule = new EmailRule(context);
-    rule.setColumnName("email");
-    rule.setColumnValue("zhangsan");
+    UrlRule rule = new UrlRule(context);
+    rule.setColumnName("url");
+    rule.setColumnValue("www.google.abc");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhangsan@xx@yy.com");
+    rule.setColumnValue("http:/intel.com");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhangsan@xx.sss");
-    assertEquals(false, rule.evaluate());
-    rule.setColumnValue("zhang.san@xx");
+    rule.setColumnValue("234-56");
     assertEquals(false, rule.evaluate());
   }
 }
