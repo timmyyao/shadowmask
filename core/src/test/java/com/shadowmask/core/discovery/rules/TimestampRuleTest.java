@@ -46,11 +46,25 @@ public class TimestampRuleTest {
     RuleContext context = new RuleContext();
     TimestampRule rule = new TimestampRule(context);
     rule.setColumnName("timestamp");
-    rule.setColumnValue("1901-01-01 00:00:00.000");
+    rule.setColumnValue("1901-01-01 00:00:00.123");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("2015-12-31 23:59:59.999");
+    rule.setColumnValue("2015.4.13 12:4:59.12");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("2015-12-31 23:59:59");
+    rule.setColumnValue("2015/12/2 23:59:3.345");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("20151231 4:09:06.345");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("2015年12月31日 23:59:59.7");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("1901-01-01 00:00:00");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("2015.4.13 12:4:59");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("2015/12/2 23:59:3");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("20151231 4:09:06");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("2015年12月31日 23:59:59");
     assertEquals(true, rule.evaluate());
   }
 
@@ -59,11 +73,11 @@ public class TimestampRuleTest {
     RuleContext context = new RuleContext();
     TimestampRule rule = new TimestampRule(context);
     rule.setColumnName("timestamp");
-    rule.setColumnValue("1900-01-01 00:00:00.000");
+    rule.setColumnValue("hello");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("2015-0-01 23:59:59.999");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("2015-13-01 23:59:59.999");
+    rule.setColumnValue("2015.13.01 23:59:59.999");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("2015-10-0 23:59:59.999");
     assertEquals(false, rule.evaluate());
@@ -79,7 +93,7 @@ public class TimestampRuleTest {
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("2015-0-0 23:59:");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("sdf");
+    rule.setColumnValue("2004,2,4 10:3:34");
     assertEquals(false, rule.evaluate());
   }
 }
