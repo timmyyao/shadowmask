@@ -17,7 +17,7 @@
  */
 package org.shadowmask.engine.hive.udf;
 
-import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -32,7 +32,6 @@ import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import scala.Int;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +40,13 @@ import java.util.Map;
 /**
  * GenericUDAFTCloseness.
  */
+@Description(name = "TCloseness",
+        value = "_FUNC_(key1, key2, ..., value) : Calculate the T-Closeness\n"
+                + "key: the masked QUSI_IDENTIFIER columns\n"
+                + "value: the sensitive columns (apply equal distance when the type is STRING or CHAR, " +
+                "apply ordered distance when the type is LONG, INT, BYTE or SHORT, other types are not supported\n"
+                + "@return: a TClosenessStatistics class containing minimal, maximal and mean T-Closeness value",
+        extended = "Example:\n")
 public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
   @Override
   public GenericUDAFEvaluator getEvaluator(TypeInfo[] parameters)
@@ -55,17 +61,25 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
       }
     }
 
-    if (((PrimitiveTypeInfo)parameters[0]).getPrimitiveCategory()
-            != PrimitiveObjectInspector.PrimitiveCategory.INT) {
-      throw new UDFArgumentException("The first argument type should be INT");
+    switch (((PrimitiveTypeInfo)parameters[parameters.length - 1]).getPrimitiveCategory()) {
+      case STRING:
+      case CHAR:
+        return new GenericUDAFTClosenessStringEvaluator();
+      case LONG:
+      case INT:
+      case BYTE:
+      case SHORT:
+        return new GenericUDAFTClosenessLongEvaluator();
+      case FLOAT:
+      case DOUBLE:
+        return new GenericUDAFTClosenessDoubleEvaluator();
+      default:
+        throw new UDFArgumentException("Only numerical and string type are accepted as sensitive attribute");
     }
-
-    return new GenericUDAFTClosenessEvaluator();
   }
 
 
-  public static class GenericUDAFTClosenessEvaluator extends GenericUDAFEvaluator {
-    private IntWritable result;
+  public static class GenericUDAFTClosenessStringEvaluator extends GenericUDAFEvaluator {
     private ObjectInspector inputKeyOI;
     private ObjectInspector inputValueOI;
 
@@ -81,14 +95,11 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
        * produced by a sql.
        */
       if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
-        /*return ObjectInspectorFactory.getReflectionObjectInspector(FreqTable.class,
-                ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                */
         inputKeyOI = (JavaStringObjectInspector)
                 ObjectInspectorFactory.getReflectionObjectInspector(String.class,
                         ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         inputValueOI = ObjectInspectorFactory.getReflectionObjectInspector(
-                UDAFTCObject.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                UDAFTCStringObject.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         return ObjectInspectorFactory.getStandardMapObjectInspector(
                 ObjectInspectorUtils.getStandardObjectInspector(inputKeyOI), inputValueOI);
 
@@ -104,7 +115,7 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
 
           internalMergeOI = (StandardMapObjectInspector) parameters[0];
 
-          return ObjectInspectorFactory.getReflectionObjectInspector(Statistics.class,
+          return ObjectInspectorFactory.getReflectionObjectInspector(TClosenessStatistics.class,
                   ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
         }
       }
@@ -114,35 +125,32 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
     /** class for storing frequency of different inputs. */
     @AggregationType
     static class FreqTable extends AbstractAggregationBuffer {
-      HashMap<String, UDAFTCObject> freqMap;
-      UDAFTCObject total;
+      HashMap<String, UDAFTCStringObject> freqMap;
+      UDAFTCStringObject total;
 
       void put(Object[] values) {
-        Integer key_columns_num = ((IntWritable) values[0]).get();
         StringBuilder key_str = new StringBuilder();
         StringBuilder value_str = new StringBuilder();
-        for (int i = 1; i <= key_columns_num; i++) {
+        for (int i = 0; i < values.length - 1; i++) {
           key_str.append(values[i]);
         }
 
-        for (int i = key_columns_num + 1; i < values.length; i++) {
-          value_str.append(values[i]);
-        }
+        value_str.append(values[values.length - 1]);
 
         // generate an unique identifier for one row
-        UDFUIdentifier uid = new UDFUIdentifier();
+        /*UDFUIdentifier uid = new UDFUIdentifier();
         Text txt = uid.evaluate(new Text(key_str.toString()));
         String key = txt.toString();
 
         txt = uid.evaluate(new Text(value_str.toString()));
-        String value = txt.toString();
+        String value = txt.toString();*/
 
-        key = key_str.toString();
-        value = value_str.toString();
+        String key = key_str.toString();
+        String value = value_str.toString();
 
         // add new item to freqMap
-        UDAFTCObject sri = new UDAFTCObject(key, value);
-        UDAFTCObject v = freqMap.get(sri.getRow());
+        UDAFTCStringObject sri = new UDAFTCStringObject(key, value);
+        UDAFTCStringObject v = freqMap.get(sri.getRow());
         if(v == null) {
           sri.setCount(1);
           freqMap.put(sri.getRow(), sri);
@@ -160,7 +168,7 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
       /**
        * return the statistics of T-Closeness value in map
        */
-      Statistics calculateStatistics() {
+      TClosenessStatistics calculateStatistics() {
         double min = Double.MAX_VALUE;
         double max = 0;
         double mean = 0;
@@ -169,7 +177,7 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
         }
 
         ArrayList<Double> equalClass = new ArrayList<Double>();
-        for (Map.Entry<String, UDAFTCObject> eachEqualClass : freqMap.entrySet()) {
+        for (Map.Entry<String, UDAFTCStringObject> eachEqualClass : freqMap.entrySet()) {
           double sum = 0;
           Map<String, Integer> eachDeversity = eachEqualClass.getValue().getDeversities();
           for (Map.Entry<String, Integer> sensitiveAttribute : total.getDeversities().entrySet()) {
@@ -192,7 +200,7 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
         }
         mean /= equalClass.size();
 
-        Statistics result = new Statistics(max, min, mean);
+        TClosenessStatistics result = new TClosenessStatistics(max, min, mean);
 
         return result;
       }
@@ -208,8 +216,8 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
 
     @Override
     public void reset(AggregationBuffer agg) throws HiveException {
-      ((FreqTable) agg).freqMap = new HashMap<String, UDAFTCObject>();
-      ((FreqTable) agg).total = new UDAFTCObject("*");
+      ((FreqTable) agg).freqMap = new HashMap<String, UDAFTCStringObject>();
+      ((FreqTable) agg).total = new UDAFTCStringObject("*");
     }
 
     @Override
@@ -221,14 +229,9 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
     @Override
     public Object terminatePartial(AggregationBuffer agg) throws HiveException {
       FreqTable ft = (FreqTable) agg;
-      HashMap<String, UDAFTCObject> ret = new HashMap<String, UDAFTCObject>();
+      HashMap<String, UDAFTCStringObject> ret = new HashMap<String, UDAFTCStringObject>();
       ret.putAll(ft.freqMap);
       ft.freqMap.clear();
-
-      /*UDAFTCObject total = new UDAFTCObject("*");
-      FreqTable ret = new FreqTable();
-      ret.total = total;
-      ret.freqMap = freqMap;*/
 
       return ret;
     }
@@ -252,9 +255,9 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
         Map m = lbm.getMap();
 
         // merge all the patial maps
-        UDAFTCObject v = ft.freqMap.get(row);
+        UDAFTCStringObject v = ft.freqMap.get(row);
         if(v == null) {
-          v = new UDAFTCObject(row);
+          v = new UDAFTCStringObject(row);
           ft.freqMap.put(row, v);
         }
         for(Object entry : m.entrySet()) {
@@ -269,23 +272,404 @@ public class GenericUDAFTCloseness extends AbstractGenericUDAFResolver {
 
     }
 
-    // The return class type to store the statistics of L-Deversity
-    static class Statistics {
-      public double maxTClosenessValue = 0;
-      public double minTClosenessValue = 0;
-      public double meanTClosenessValue = 0;
+    @Override
+    public Object terminate(AggregationBuffer agg) throws HiveException {
+      return ((FreqTable)agg).calculateStatistics();
+    }
+  }
 
-      public Statistics () {
-        maxTClosenessValue = 0;
-        minTClosenessValue = 0;
-        meanTClosenessValue = 0;
+  public static class GenericUDAFTClosenessDoubleEvaluator extends GenericUDAFEvaluator {
+    private ObjectInspector inputKeyOI;
+    private ObjectInspector inputValueOI;
+
+    private StandardMapObjectInspector internalMergeOI;
+
+    /** init not completed */
+    @Override
+    public ObjectInspector init(Mode m, ObjectInspector[] parameters)
+            throws HiveException {
+      super.init(m, parameters);
+      /*
+       * In partial1, parameters are the inspectors of resultant columns
+       * produced by a sql.
+       */
+      if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
+        /*return ObjectInspectorFactory.getReflectionObjectInspector(FreqTable.class,
+                ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                */
+        inputKeyOI = (JavaStringObjectInspector)
+                ObjectInspectorFactory.getReflectionObjectInspector(String.class,
+                        ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+        inputValueOI = ObjectInspectorFactory.getReflectionObjectInspector(
+                UDAFTCDoubleObject.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+        return ObjectInspectorFactory.getStandardMapObjectInspector(
+                ObjectInspectorUtils.getStandardObjectInspector(inputKeyOI), inputValueOI);
+
+      } else {
+        if(m == Mode.COMPLETE) {
+          return PrimitiveObjectInspectorFactory.writableIntObjectInspector;
+        } else {
+          if (parameters.length > 1) throw new UDFArgumentException("Init parameters are incorrect");
+
+          if (!(parameters[0] instanceof StandardMapObjectInspector)) {
+            throw new UDFArgumentException("Init error for merge: Parameter is not a standard map object inspector!");
+          }
+
+          internalMergeOI = (StandardMapObjectInspector) parameters[0];
+
+          return ObjectInspectorFactory.getReflectionObjectInspector(TClosenessStatistics.class,
+                  ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+        }
+      }
+    }
+
+
+    /** class for storing frequency of different inputs. */
+    @AggregationType
+    static class FreqTable extends AbstractAggregationBuffer {
+      HashMap<String, UDAFTCDoubleObject> freqMap;
+      UDAFTCDoubleObject total;
+
+      void put(Object[] values) {
+        StringBuilder key_str = new StringBuilder();
+        StringBuilder value_str = new StringBuilder();
+        for (int i = 0; i < values.length - 1; i++) {
+          key_str.append(values[i]);
+        }
+        value_str.append(values[values.length - 1]);
+
+        // generate an unique identifier for one row
+        /*UDFUIdentifier uid = new UDFUIdentifier();
+        Text txt = uid.evaluate(new Text(key_str.toString()));
+        String key = txt.toString();
+
+        txt = uid.evaluate(new Text(value_str.toString()));
+        String value = txt.toString();*/
+
+        String key = key_str.toString();
+        Double value = Double.parseDouble(value_str.toString());
+
+        // add new item to freqMap
+        UDAFTCDoubleObject sri = new UDAFTCDoubleObject(key, value);
+        UDAFTCDoubleObject v = freqMap.get(sri.getRow());
+        if(v == null) {
+          sri.setCount(1);
+          freqMap.put(sri.getRow(), sri);
+        } else {
+          v.put(sri.getSensitiveValue());
+          v.increase(1);
+        }
+
+        // add new item to total
+        total.put(sri.getSensitiveValue());
+        total.increase(1);
       }
 
-      public Statistics (double maxTClosenessValue, double minTClosenessValue, double meanTClosenessValue) {
-        this.maxTClosenessValue = maxTClosenessValue;
-        this.minTClosenessValue = minTClosenessValue;
-        this.meanTClosenessValue = meanTClosenessValue;
+
+      /**
+       * return the statistics of T-Closeness value in map
+       */
+      TClosenessStatistics calculateStatistics() {
+        double min = Double.MAX_VALUE;
+        double max = 0;
+        double mean = 0;
+        if (freqMap == null || freqMap.size() == 0) {
+          return null;
+        }
+
+        ArrayList<Double> equalClass = new ArrayList<Double>();
+        for (Map.Entry<String, UDAFTCDoubleObject> eachEqualClass : freqMap.entrySet()) {
+          double sum = 0;
+          double s = 0;
+          Map<Double, Integer> eachDeversity = eachEqualClass.getValue().getDeversities();
+          for (Map.Entry<Double, Integer> sensitiveAttribute : total.getDeversities().entrySet()) {
+            Double sensitiveAttributeValue = sensitiveAttribute.getKey();
+            double q = (double)sensitiveAttribute.getValue()/total.getCount();
+            double p = 0;
+            Integer pNum = eachDeversity.get(sensitiveAttributeValue);
+            if (pNum != null) {
+              p = (double)pNum/eachEqualClass.getValue().getCount();
+            }
+            s += p - q;
+            sum += Math.abs(s);
+          }
+          equalClass.add(sum/(total.getCount()-1));
+        }
+        // find max, min and mean
+        for (Double e : equalClass) {
+          min = e < min ? e : min;
+          max = e > max ? e : max;
+          mean += e;
+        }
+        mean /= equalClass.size();
+
+        TClosenessStatistics result = new TClosenessStatistics(max, min, mean);
+
+        return result;
       }
+
+    }
+
+    @Override
+    public AggregationBuffer getNewAggregationBuffer() throws HiveException {
+      FreqTable buffer = new FreqTable();
+      reset(buffer);
+      return buffer;
+    }
+
+    @Override
+    public void reset(AggregationBuffer agg) throws HiveException {
+      ((FreqTable) agg).freqMap = new HashMap<String, UDAFTCDoubleObject>();
+      ((FreqTable) agg).total = new UDAFTCDoubleObject("*");
+    }
+
+    @Override
+    public void iterate(AggregationBuffer agg, Object[] parameters) throws HiveException {
+      // TODO: Directly call merge(...) method.
+      ((FreqTable) agg).put(parameters);
+    }
+
+    @Override
+    public Object terminatePartial(AggregationBuffer agg) throws HiveException {
+      FreqTable ft = (FreqTable) agg;
+      HashMap<String, UDAFTCDoubleObject> ret = new HashMap<String, UDAFTCDoubleObject>();
+      ret.putAll(ft.freqMap);
+      ft.freqMap.clear();
+
+      return ret;
+    }
+
+    /** NOTE: LazyBinaryMap's key object must be a wrtiable primitive objects*/
+    @Override
+    public void merge(AggregationBuffer agg, Object partial) throws HiveException {
+      HashMap<Object, Object> result = (HashMap<Object, Object>) internalMergeOI.getMap(partial);
+      FreqTable ft = (FreqTable) agg;
+
+      for (Map.Entry<Object, Object> e : result.entrySet()) {
+
+        Text rowTxt = (Text)((LazyBinaryStruct)e.getValue()).getField(0);
+        String row = rowTxt.toString();
+        IntWritable count = (IntWritable)((LazyBinaryStruct)e.getValue()).getField(1);
+
+        LazyBinaryMap lbm = (LazyBinaryMap)((LazyBinaryStruct)e.getValue()).getField(3);
+        Map m = lbm.getMap();
+
+        // merge all the patial maps
+        UDAFTCDoubleObject v = ft.freqMap.get(row);
+        if(v == null) {
+          v = new UDAFTCDoubleObject(row);
+          ft.freqMap.put(row, v);
+        }
+        for(Object entry : m.entrySet()) {
+          Double val = Double.parseDouble(((Map.Entry)entry).getKey().toString());
+          int valNumber = ((IntWritable)((Map.Entry)entry).getValue()).get();
+          v.put(val, valNumber);
+          ft.total.put(val, valNumber);
+        }
+        v.increase(count.get());
+        ft.total.increase(count.get());
+      }
+
+    }
+
+    @Override
+    public Object terminate(AggregationBuffer agg) throws HiveException {
+      return ((FreqTable)agg).calculateStatistics();
+    }
+  }
+
+  public static class GenericUDAFTClosenessLongEvaluator extends GenericUDAFEvaluator {
+    private ObjectInspector inputKeyOI;
+    private ObjectInspector inputValueOI;
+
+    private StandardMapObjectInspector internalMergeOI;
+
+    /** init not completed */
+    @Override
+    public ObjectInspector init(Mode m, ObjectInspector[] parameters)
+            throws HiveException {
+      super.init(m, parameters);
+      /*
+       * In partial1, parameters are the inspectors of resultant columns
+       * produced by a sql.
+       */
+      if (m == Mode.PARTIAL1 || m == Mode.PARTIAL2) {
+        /*return ObjectInspectorFactory.getReflectionObjectInspector(FreqTable.class,
+                ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                */
+        inputKeyOI = (JavaStringObjectInspector)
+                ObjectInspectorFactory.getReflectionObjectInspector(String.class,
+                        ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+        inputValueOI = ObjectInspectorFactory.getReflectionObjectInspector(
+                UDAFTCLongObject.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+        return ObjectInspectorFactory.getStandardMapObjectInspector(
+                ObjectInspectorUtils.getStandardObjectInspector(inputKeyOI), inputValueOI);
+
+      } else {
+        if(m == Mode.COMPLETE) {
+          return PrimitiveObjectInspectorFactory.writableIntObjectInspector;
+        } else {
+          if (parameters.length > 1) throw new UDFArgumentException("Init parameters are incorrect");
+
+          if (!(parameters[0] instanceof StandardMapObjectInspector)) {
+            throw new UDFArgumentException("Init error for merge: Parameter is not a standard map object inspector!");
+          }
+
+          internalMergeOI = (StandardMapObjectInspector) parameters[0];
+
+          return ObjectInspectorFactory.getReflectionObjectInspector(TClosenessStatistics.class,
+                  ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+        }
+      }
+    }
+
+
+    /** class for storing frequency of different inputs. */
+    @AggregationType
+    static class FreqTable extends AbstractAggregationBuffer {
+      HashMap<String, UDAFTCLongObject> freqMap;
+      UDAFTCLongObject total;
+
+      void put(Object[] values) {
+        StringBuilder key_str = new StringBuilder();
+        StringBuilder value_str = new StringBuilder();
+        for (int i = 0; i < values.length - 1; i++) {
+          key_str.append(values[i]);
+        }
+        value_str.append(values[values.length - 1]);
+
+        // generate an unique identifier for one row
+        /*UDFUIdentifier uid = new UDFUIdentifier();
+        Text txt = uid.evaluate(new Text(key_str.toString()));
+        String key = txt.toString();
+
+        txt = uid.evaluate(new Text(value_str.toString()));
+        String value = txt.toString();*/
+
+        String key = key_str.toString();
+        Long value = Long.parseLong(value_str.toString());
+
+        // add new item to freqMap
+        UDAFTCLongObject sri = new UDAFTCLongObject(key, value);
+        UDAFTCLongObject v = freqMap.get(sri.getRow());
+        if(v == null) {
+          sri.setCount(1);
+          freqMap.put(sri.getRow(), sri);
+        } else {
+          v.put(sri.getSensitiveValue());
+          v.increase(1);
+        }
+
+        // add new item to total
+        total.put(sri.getSensitiveValue());
+        total.increase(1);
+      }
+
+
+      /**
+       * return the statistics of T-Closeness value in map
+       */
+      TClosenessStatistics calculateStatistics() {
+        double min = Double.MAX_VALUE;
+        double max = 0;
+        double mean = 0;
+        if (freqMap == null || freqMap.size() == 0) {
+          return null;
+        }
+
+        ArrayList<Double> equalClass = new ArrayList<Double>();
+        for (Map.Entry<String, UDAFTCLongObject> eachEqualClass : freqMap.entrySet()) {
+          double sum = 0;
+          double s = 0;
+          Map<Long, Integer> eachDeversity = eachEqualClass.getValue().getDeversities();
+          for (Map.Entry<Long, Integer> sensitiveAttribute : total.getDeversities().entrySet()) {
+            Long sensitiveAttributeValue = sensitiveAttribute.getKey();
+            double q = (double)sensitiveAttribute.getValue()/total.getCount();
+            double p = 0;
+            Integer pNum = eachDeversity.get(sensitiveAttributeValue);
+            if (pNum != null) {
+              p = (double)pNum/eachEqualClass.getValue().getCount();
+            }
+            s += p - q;
+            sum += Math.abs(s);
+          }
+          equalClass.add(sum/(total.getCount()-1));
+        }
+        // find max, min and mean
+        for (Double e : equalClass) {
+          min = e < min ? e : min;
+          max = e > max ? e : max;
+          mean += e;
+        }
+        mean /= equalClass.size();
+
+        TClosenessStatistics result = new TClosenessStatistics(max, min, mean);
+
+        return result;
+      }
+
+    }
+
+    @Override
+    public AggregationBuffer getNewAggregationBuffer() throws HiveException {
+      FreqTable buffer = new FreqTable();
+      reset(buffer);
+      return buffer;
+    }
+
+    @Override
+    public void reset(AggregationBuffer agg) throws HiveException {
+      ((FreqTable) agg).freqMap = new HashMap<String, UDAFTCLongObject>();
+      ((FreqTable) agg).total = new UDAFTCLongObject("*");
+    }
+
+    @Override
+    public void iterate(AggregationBuffer agg, Object[] parameters) throws HiveException {
+      // TODO: Directly call merge(...) method.
+      ((FreqTable) agg).put(parameters);
+    }
+
+    @Override
+    public Object terminatePartial(AggregationBuffer agg) throws HiveException {
+      FreqTable ft = (FreqTable) agg;
+      HashMap<String, UDAFTCLongObject> ret = new HashMap<String, UDAFTCLongObject>();
+      ret.putAll(ft.freqMap);
+      ft.freqMap.clear();
+
+      return ret;
+    }
+
+    /** NOTE: LazyBinaryMap's key object must be a wrtiable primitive objects*/
+    @Override
+    public void merge(AggregationBuffer agg, Object partial) throws HiveException {
+      HashMap<Object, Object> result = (HashMap<Object, Object>) internalMergeOI.getMap(partial);
+      FreqTable ft = (FreqTable) agg;
+
+      for (Map.Entry<Object, Object> e : result.entrySet()) {
+
+        Text rowTxt = (Text)((LazyBinaryStruct)e.getValue()).getField(0);
+        String row = rowTxt.toString();
+        IntWritable count = (IntWritable)((LazyBinaryStruct)e.getValue()).getField(1);
+
+        LazyBinaryMap lbm = (LazyBinaryMap)((LazyBinaryStruct)e.getValue()).getField(3);
+        Map m = lbm.getMap();
+
+        // merge all the patial maps
+        UDAFTCLongObject v = ft.freqMap.get(row);
+        if(v == null) {
+          v = new UDAFTCLongObject(row);
+          ft.freqMap.put(row, v);
+        }
+        for(Object entry : m.entrySet()) {
+          Long val = Long.parseLong(((Map.Entry)entry).getKey().toString());
+          int valNumber = ((IntWritable)((Map.Entry)entry).getValue()).get();
+          v.put(val, valNumber);
+          ft.total.put(val, valNumber);
+        }
+        v.increase(count.get());
+        ft.total.increase(count.get());
+      }
+
     }
 
     @Override

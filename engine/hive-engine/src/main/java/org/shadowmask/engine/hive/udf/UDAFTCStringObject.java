@@ -21,14 +21,14 @@ package org.shadowmask.engine.hive.udf;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class UDAFTCObject {
+public class UDAFTCStringObject {
   private String row_key; // the key of this category
   private int count = 0; // the number of items in this category
   private String sensitive_value; // the newly added sensitive value in this category
   private Map<String, Integer> deversities; // the map of sensitive values
   private int deversityNum = 0; // the number of deversities
 
-  public UDAFTCObject(String code) {
+  public UDAFTCStringObject(String code) {
     count = 0;
     row_key = code;
     sensitive_value = null;
@@ -36,7 +36,7 @@ public class UDAFTCObject {
     deversityNum = 0;
   }
 
-  public UDAFTCObject(String code, String value) {
+  public UDAFTCStringObject(String code, String value) {
     count = 1;
     row_key = code;
     this.sensitive_value = value;
@@ -60,7 +60,7 @@ public class UDAFTCObject {
     if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    UDAFTCObject row = (UDAFTCObject) obj;
+    UDAFTCStringObject row = (UDAFTCStringObject) obj;
     if(!row_key.equals(row.row_key)) return false;
     return true;
   }
