@@ -58,4 +58,5 @@ public interface JDBCConnectionDesc extends Serializable {
    * @return
    */
   String toUrl();
+
 }

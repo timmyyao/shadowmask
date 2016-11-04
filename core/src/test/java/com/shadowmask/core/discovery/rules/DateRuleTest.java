@@ -48,7 +48,13 @@ public class DateRuleTest {
     rule.setColumnName("date");
     rule.setColumnValue("2013-01-01");
     assertEquals(true, rule.evaluate());
-    rule.setColumnValue("1901-12-31");
+    rule.setColumnValue("1991/1/31");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("19910323");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("1991.12.3");
+    assertEquals(true, rule.evaluate());
+    rule.setColumnValue("1991年2月1日");
     assertEquals(true, rule.evaluate());
   }
 
@@ -57,17 +63,17 @@ public class DateRuleTest {
     RuleContext context = new RuleContext();
     DateRule rule = new DateRule(context);
     rule.setColumnName("date");
-    rule.setColumnValue("1900-02-12");
+    rule.setColumnValue("hello");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("2000-13-12");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("2000-0-12");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("2000-02-0");
+    rule.setColumnValue("2000-2-0");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("1800-02-32");
+    rule.setColumnValue("1990-11-31");
     assertEquals(false, rule.evaluate());
-    rule.setColumnValue("sdf");
+    rule.setColumnValue("2013:11:22");
     assertEquals(false, rule.evaluate());
     rule.setColumnValue("2003-3d-rr");
     assertEquals(false, rule.evaluate());

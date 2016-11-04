@@ -18,5 +18,5 @@
 package org.shadowmask.model.datareader;
 
 public interface Function<T, R> {
-  R filt(T t);
+  R apply(T t);
 }

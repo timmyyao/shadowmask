@@ -17,8 +17,12 @@
  */
 package org.shadowmask.core.discovery.rules;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.shadowmask.core.discovery.DataDiscoveryException;
 import org.shadowmask.core.discovery.RuleContext;
+import org.shadowmask.core.type.DateFormatPattern;
 
 /**
  * This rule would evaluate whether the column value is a date.
@@ -31,22 +35,19 @@ public class DateRule extends QusiIdentifierRule {
       throw new DataDiscoveryException(
           "Should fill the column value before fire inspect rules.");
     }
-    String subs[] = value.split("-");
-    if (subs.length != 3) {
-      return false;
+    DateTimeFormatter format;
+    DateTime dateTime;
+    for (String pattern : DateFormatPattern.patterns) {
+      format = DateTimeFormat.forPattern(pattern);
+      try {
+        dateTime = DateTime.parse(value, format);
+      } catch (Exception e) {
+        continue;
+      }
+      if (dateTime != null) {
+        return true;
+      }
     }
-    int subsValue[] = new int[3];
-    try {
-      subsValue[0] = Integer.decode(subs[0]);
-      subsValue[1] = Integer.decode(subs[1]);
-      subsValue[2] = Integer.decode(subs[2]);
-    } catch (NumberFormatException e) {
-      return false;
-    }
-    // Requirements of date "year-month-day" : year>1900, 1<=month<=12, 1<=day<=31
-    if (subsValue[0] < 1901 || subsValue[1] < 1 || subsValue[1] > 12 || subsValue[2] < 1 || subsValue[2] > 31) {
-      return false;
-    }
-    return  true;
+    return false;
   }
 }

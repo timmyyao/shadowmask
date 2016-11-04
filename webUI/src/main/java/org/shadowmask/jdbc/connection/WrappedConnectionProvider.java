@@ -19,6 +19,8 @@
 package org.shadowmask.jdbc.connection;
 
 import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
+import org.shadowmask.jdbc.connection.description.KerberizedHive2JdbcConnDesc;
+import org.shadowmask.jdbc.connection.description.SimpleHive2JdbcConnDesc;
 
 import java.sql.Connection;
 
@@ -32,7 +34,16 @@ public class WrappedConnectionProvider implements ConnectionProvider {
   }
 
   @Override public Connection get(JDBCConnectionDesc desc) {
-    return KerberizedHiveConnectionProvider.getInstance().get(desc);
+    if (desc instanceof KerberizedHive2JdbcConnDesc) {
+      return KerberizedHiveConnectionProvider.getInstance()
+          .get((KerberizedHive2JdbcConnDesc) desc);
+    } else if (desc instanceof SimpleHive2JdbcConnDesc) {
+      return SimpleHiveConnectionProvider.getInstance()
+          .get((SimpleHive2JdbcConnDesc) desc);
+    }
+    throw new RuntimeException(String
+        .format("jdbc connection not acquired with jdbc description : %s ",
+            desc));
   }
 
   // singleton

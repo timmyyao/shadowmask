@@ -18,10 +18,23 @@
 
 package org.shadowmask.jdbc.connection.description;
 
+/**
+ * base class of hive2 server connection description information.
+ */
 public abstract class Hive2JdbcConnDesc implements JDBCConnectionDesc {
 
   @Override public String prefix() {
     return "hive2";
+  }
+
+  // default schema .
+  @Override public String schema() {
+    return "default";
+  }
+
+  //hive server default port .
+  @Override public int port() {
+    return 10000;
   }
 
   @Override public String toUrl() {
