@@ -22,7 +22,7 @@ case class IPMask(child: Expression, level: Int) extends UnaryExpression with St
 
   override protected def genCode(ctx: CodeGenContext, ev: GeneratedExpressionCode): String = {
 
-    defineCodeGen(ctx, ev, c => s"org.shadowmask.engine.spark.dsl.MaskExpressionsUtil.maskIp($c, $level)")
+    defineCodeGen(ctx, ev, c => s"org.shadowmask.engine.spark.expressions.MaskExpressionsUtil.maskIp($c, $level)")
   }
 
   override def convert(v: UTF8String): UTF8String = {

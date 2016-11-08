@@ -22,7 +22,7 @@ import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
 
 import java.sql.Connection;
 
-public interface ConnectionProvider extends Supplier<Connection> {
+public interface ConnectionProvider<DESC extends JDBCConnectionDesc> extends Supplier<Connection> {
 
-  Connection get(JDBCConnectionDesc desc);
+  Connection get(DESC desc);
 }

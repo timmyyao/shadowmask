@@ -18,6 +18,10 @@
 package org.shadowmask.framework.task;
 
 import org.apache.log4j.Logger;
+import org.shadowmask.jdbc.connection.description.JDBCConnectionDesc;
+import org.shadowmask.model.datareader.Command;
+import org.shadowmask.utils.NeverThrow;
+import org.shadowmask.utils.ReThrow;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,47 +30,33 @@ import java.sql.SQLException;
 /**
  * Executed jdbc  task .
  */
-public abstract class ExecutedJdbcTask extends JDBCTask {
+public abstract class ExecutedJdbcTask<W extends RollbackableProcedureWatcher, DESC extends JDBCConnectionDesc>
+    extends JDBCTask<W, DESC> {
   Logger logger = Logger.getLogger(this.getClass());
 
-  public abstract RollbackableProcedureWatcher watcher();
+  Connection connection = null;
 
   @Override public void invoke() {
-    Connection connection = null;
+
     try {
-      if (watcher() != null) {
-        watcher().preStart();
-      }
-      PreparedStatement stm = connection.prepareStatement(sql());
-      stm.execute();
-      connection.commit();
-      if (watcher() != null) {
-        watcher().onComplete();
-      }
+      triggerPreStart();
+      run();
+      triggerComplete();
     } catch (Exception e) {
+      e.printStackTrace();
       logger.warn(
           String.format("Exception occurred when execute sql[ %s ]", sql()), e);
-      if (watcher() != null) {
-        watcher().onException(e);
-      }
-      if (rollbackAble()) {
+      triggerException(e);
+      if (transationSupport()) {
         try {
-          if (watcher() != null) {
-            watcher().onRollbackStart();
-          }
+          triggerPreRollback();
           connection.rollback();
-          if (watcher() != null) {
-            watcher().onRollBackCompeleted();
-          }
+          triggerRollbackCompleted();
         } catch (SQLException e1) {
-          if (watcher() != null) {
-            watcher().onRollBackException(e1);
-            logger.warn(String
-                    .format("Exception occurred when rollback [ %s ]", connection),
-                e);
-          }
+          triggerRollbackException(e1);
         }
       }
+      ReThrow.rethrow(e);
     } finally {
       if (connection != null)
         try {
@@ -75,8 +65,70 @@ public abstract class ExecutedJdbcTask extends JDBCTask {
           logger.warn(String
               .format("Exception occurred when release connection[ %s ]",
                   connection), e);
+          ReThrow.rethrow(e);
         }
+    }
+  }
+
+  @Override public void run() {
+    connection = connectDB();
+    triggerConnectionBuilt(connection);
+    PreparedStatement stm = null;
+    try {
+      stm = connection.prepareStatement(sql());
+      stm.execute();
+      if (transationSupport()) {
+        connection.commit();
+      }
+    } catch (SQLException e) {
+      ReThrow.rethrow(e);
     }
 
   }
+
+  /**
+   * trigger preRollback .
+   */
+  void triggerPreRollback() {
+    if (getAllWatchers() != null) {
+      for (final W w : getAllWatchers()) {
+        NeverThrow.exe(new Command() {
+          @Override public void exe() {
+            w.onRollbackStart();
+          }
+        }, new NeverThrow.LoggerConsumer(), null);
+      }
+    }
+  }
+
+  /**
+   * trigger rollbackException
+   */
+  void triggerRollbackException(final Throwable t) {
+    if (getAllWatchers() != null) {
+      for (final W w : getAllWatchers()) {
+        NeverThrow.exe(new Command() {
+          @Override public void exe() {
+            w.onRollBackException(t);
+          }
+        }, new NeverThrow.LoggerConsumer(), null);
+      }
+    }
+  }
+
+  /**
+   * trigger rollback completed .
+   */
+  void triggerRollbackCompleted() {
+    if (getAllWatchers() != null) {
+      for (final W w : getAllWatchers()) {
+        NeverThrow.exe(new Command() {
+          @Override public void exe() {
+            w.onRollBackCompeleted();
+          }
+        }, new NeverThrow.LoggerConsumer(), null);
+      }
+    }
+  }
+
 }

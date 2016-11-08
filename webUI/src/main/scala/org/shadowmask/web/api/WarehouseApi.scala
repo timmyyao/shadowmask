@@ -25,6 +25,7 @@ import org.scalatra.servlet.FileUploadSupport
 import org.scalatra.swagger._
 import org.shadowmask.web.common.user.ConfiguredAuthProvider
 import org.shadowmask.web.model._
+import org.shadowmask.web.service.HiveService
 
 import scala.collection.immutable.List
 
@@ -95,17 +96,15 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   post("/mask", operation(warehouseMaskPostOperation)) {
 
-
-    val authToken = request.getHeader("authToken")
-
-    println("authToken: " + authToken)
-
+    val authToken = request.getHeader("Authorization")
 
     val maskRule = parsedBody.extract[MaskRequest]
 
-    println("maskRule: " + maskRule)
+    HiveService().submitMaskTask(maskRule)
+
     SimpleResult(0, "ok");
   }
+
 
 
   val warehouseMaskRulesGetOperation = (apiOperation[MaskRulesResult]("warehouseMaskRulesGet")
@@ -123,65 +122,18 @@ class WarehouseApi(implicit val swagger: Swagger) extends ScalatraServlet
     MaskRulesResult(
       0,
       "ok",
-      List(
-        MaskType(
-          "1",
-          "masksub",
-          "ddxx",
-          List(
-            MaskRule(
-              "rule11",
-              "ruleName11",
-              "rule1Desc11",
-              List(
-                MaskRuleParam("param1", "paraDesc", "string"), MaskRuleParam("param2", "paraDesc", "string")
-              )
-            ), MaskRule(
-              "rule12",
-              "ruleName12",
-              "rule1Desc12",
-              List(
-                MaskRuleParam("cccc", "paraDesc", "string")
-              )
-            )
-          )
-        ), MaskType(
-          "2",
-          "masksub",
-          "ddxx",
-          List(
-            MaskRule(
-              "rule21",
-              "ruleName21",
-              "rule1Desc21",
-              List(
-                MaskRuleParam("dd", "paraDesc", "string"), MaskRuleParam("ffff", "paraDesc", "string")
-              )
-            ), MaskRule(
-              "rule22",
-              "ruleName22",
-              "rule1Desc22",
-              List(
-                MaskRuleParam("param1", "paraDesc", "string")
-              )
-            ), MaskRule(
-              "rule23",
-              "ruleName23",
-              "rule1Desc23",
-              List(
-                MaskRuleParam("ls", "paraDesc", "string"), MaskRuleParam("res", "paraDesc", "string"), MaskRuleParam("res1", "paraDesc", "string")
-              )
-            )
-          )
-        )
-      )
+      MaskRules.rules
     )
   }
 
 
   val warehousePrivacyRiskGetOperation = (apiOperation[PriRiskResult]("warehousePrivacyRiskGet")
     summary "fetch all mask rules supported ."
-    parameters(headerParam[String]("Authorization").description(""), formParam[String]("source").description(""), formParam[String]("datasetType").description(""), formParam[String]("schema").description(""), formParam[String]("name").description(""))
+    parameters(headerParam[String]("Authorization").description(""),
+    queryParam[String]("source").description(""),
+    queryParam[String]("datasetType").description(""),
+    queryParam[String]("schema").description(""),
+    queryParam[String]("name").description(""))
     )
 
   get("/privacyRisk", operation(warehousePrivacyRiskGetOperation)) {

@@ -48,7 +48,7 @@
         "summary": "get all users.",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -70,7 +70,7 @@
         "summary": "grant priviledges.",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -126,7 +126,7 @@
         "summary": "Adminstrator login api",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -134,7 +134,7 @@
           },
           {
             "name": "source",
-            "in": "formData",
+            "in": "query",
             "description": "hive,spark,etc",
             "required": true,
             "type": "string"
@@ -155,7 +155,7 @@
         "summary": "get n-first record of a table",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -163,35 +163,35 @@
           },
           {
             "name": "source",
-            "in": "formData",
+            "in": "query",
             "description": "HIVE,SPARK, etc.",
             "required": true,
             "type": "string"
           },
           {
             "name": "datasetType",
-            "in": "formData",
+            "in": "query",
             "description": "VIEW,TABLE,etc",
             "required": true,
             "type": "string"
           },
           {
             "name": "schema",
-            "in": "formData",
+            "in": "query",
             "description": "the schema witch the dataset belongs to",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "in": "formData",
+            "in": "query",
             "description": "name of dataset",
             "required": true,
             "type": "string"
           },
           {
             "name": "rows",
-            "in": "formData",
+            "in": "query",
             "description": "how many rows will get",
             "required": true,
             "type": "integer"
@@ -212,7 +212,7 @@
         "summary": "get all cloumn types",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -229,12 +229,62 @@
         }
       }
     },
+    "/data/task": {
+      "get": {
+        "summary": "fetch all task in some state .",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "auth token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "taskType",
+            "in": "query",
+            "description": "0-submited,1-finished,2-failed",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fetchType",
+            "in": "query",
+            "description": "0-all,1-paging",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "index of page , 0-based ,default to 0",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "size of the page",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return fetch results .",
+            "schema": {
+              "$ref": "#/definitions/TaskResult"
+            }
+          }
+        }
+      }
+    },
     "/warehouse/dataset/delete": {
       "post": {
         "summary": "delete an table",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -284,7 +334,7 @@
         "summary": "fetch all mask rules supported .",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -306,7 +356,7 @@
         "summary": "fetch all mask rules supported .",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -336,7 +386,7 @@
         "summary": "fetch all mask rules supported .",
         "parameters": [
           {
-            "name": "authToken",
+            "name": "Authorization",
             "in": "header",
             "description": "auth token",
             "required": true,
@@ -344,28 +394,28 @@
           },
           {
             "name": "source",
-            "in": "formData",
+            "in": "query",
             "description": "HIVE,SPARK, etc.",
             "required": true,
             "type": "string"
           },
           {
             "name": "datasetType",
-            "in": "formData",
+            "in": "query",
             "description": "VIEW,TABLE,etc",
             "required": true,
             "type": "string"
           },
           {
             "name": "schema",
-            "in": "formData",
+            "in": "query",
             "description": "the schema witch the dataset belongs to",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
-            "in": "formData",
+            "in": "query",
             "description": "name of dataset",
             "required": true,
             "type": "string"
@@ -586,6 +636,49 @@
           "type": "string"
         },
         "color": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "totalNum": {
+              "type": "integer"
+            },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TaskViewObject"
+              }
+            }
+          }
+        }
+      }
+    },
+    "TaskViewObject": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "name of the task"
+        },
+        "submitedTime": {
+          "type": "string"
+        },
+        "finishedTime": {
+          "type": "string"
+        },
+        "exceptedTime": {
           "type": "string"
         }
       }

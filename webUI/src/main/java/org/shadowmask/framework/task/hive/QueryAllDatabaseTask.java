@@ -25,7 +25,7 @@ import org.shadowmask.utils.HiveProps;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class QueryAllDatabaseTask extends HiveQueryTask<String> {
+public class QueryAllDatabaseTask extends HiveQueryTask<String,KerberizedHive2JdbcConnDesc> {
 
   private static final long serialVersionUID = -7452643385780361767L;
   private JdbcResultCollector<String> collector;
@@ -57,7 +57,7 @@ public class QueryAllDatabaseTask extends HiveQueryTask<String> {
     return "show tables";
   }
 
-  @Override public JDBCConnectionDesc connectionDesc() {
+  @Override public KerberizedHive2JdbcConnDesc connectionDesc() {
     return new KerberizedHive2JdbcConnDesc() {
       private static final long serialVersionUID = -1724843659999451054L;
 
